@@ -1,0 +1,12 @@
+#Not filter path , filtered according to the index
+1=/index.jsp
+2=login.action
+3=/gologin.jsp
+4=/test/
+5=scan.action
+7=pda\!wjPdaLogin.action
+8=pda\!getInfoByXTDABH.action
+9=pda\!getNeedTakePic.action
+10=pda\!picUpToSrever.action
+11=pda\!picUpLoadAgain.action
+12=pubAction.action

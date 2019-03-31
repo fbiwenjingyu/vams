@@ -1,0 +1,51 @@
+@CHARSET "UTF-8";
+
+*{
+   margin:0px;
+   padding:0px;
+   list-style: none;
+
+}
+.star{
+	color: red;
+}
+
+
+/*档案格div样式*/
+.div_ge{
+	border: 3px solid #0078ff; 
+}
+/*档案格div样式fedede*/
+.div_ge_red{
+	border: 3px solid #0078ff; 
+	background-color: #ffbfb0;
+}
+.div_ge_yellow{
+	border: 3px solid #0078ff; 
+	background-color: #ffe96d;
+}
+/*档案柜table样式*/
+.div_gui{
+	border: 1px solid;
+	display: none;
+}
+/*档案格储位编号显示*/
+.ge_cwbh_show{
+	font-size: 20px;
+	font: bold;
+}
+/**使用量*/
+.ge_cwbh_used{ 
+	font-size: 16px;
+	font: bold;
+}
+/**档案格按钮样式*/
+.btn_ge{
+	height: 26px;
+	width: 80px;
+}
+/**档案格按钮样式*/
+.btn_ge_get{
+	height: 26px;
+	width: 100px;
+}

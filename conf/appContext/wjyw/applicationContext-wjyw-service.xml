@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<beans>
+	<!--spring 管理外检业务service业务逻辑层-->
+	<bean id="ycInfoService" class="com.pd.wjyw.service.impl.YcInfoServiceImpl">
+		<property name="ycInfoDAO" ref="ycInfoDAO"></property>
+		<property name="ycInfoPicDAO" ref="ycInfoPicDAO"></property>
+		<property name="arcStatusRecordDAO" ref="arcStatusRecordDAO"></property>
+		<property name="arcBaseInfoDAO" ref="arcBaseInfoDAO"></property>
+		<property name="jdbcTemplate"><ref bean="jdbcTemplate"/></property>
+	</bean>
+	
+	<bean id="ycInfoPicService" class="com.pd.wjyw.service.impl.YcInfoPicServiceImpl">
+		<property name="ycInfoPicDAO" ref="ycInfoPicDAO"></property>
+	</bean>
+	
+	<bean id="ycPaperService" class="com.pd.wjyw.service.impl.YcPaperServiceImpl">
+		<property name="ycPaperDAO" ref="ycPaperDAO"></property>
+	</bean>
+	
+	<bean id="ycTypePaperService" class="com.pd.wjyw.service.impl.YcTypePaperServiceImpl">
+		<property name="ycTypePaperDAO" ref="ycTypePaperDAO"></property>
+	</bean>
+	
+	<bean id="ycInfoBarcodeService" class="com.pd.wjyw.service.impl.YcInfoBarcodeServiceImpl">
+		<property name="ycInfoDAO" ref="ycInfoDAO"></property>
+		<property name="arcBaseInfoDAO" ref="arcBaseInfoDAO"></property>
+		<property name="arcStatusRecordDAO" ref="arcStatusRecordDAO"></property>
+		<property name="jdbcTemplate1" ref="jdbcTemplate1"></property>
+		
+	</bean>
+	
+	<bean id="arcBaseYcInfoService" class="com.pd.tjcx.service.ArcBaseYcInfoService">
+		<property name="ycInfoDAO" ref="ycInfoDAO"></property>
+		<property name="arcBaseDAO" ref="arcBaseInfoDAO"></property>
+	</bean>
+	
+	<bean id="barcodeService" class="com.pd.system.res.BarcodeService">
+		<property name="ycInfoDAO" ref="ycInfoDAO"></property>
+	</bean>
+</beans>

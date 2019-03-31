@@ -1,0 +1,447 @@
+package com.pd.webservice.scan.commands;
+
+import java.io.File;
+import java.sql.Timestamp;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.pd.arc.model.ArcBaseInfo;
+import com.pd.arc.model.ArcPicInfo;
+import com.pd.arc.model.ArcStatusRecord;
+import com.pd.arc.service.ArcBaseInfoService;
+import com.pd.system.framework.DAOFactory;
+import com.pd.system.res.ArcStatus;
+import com.pd.system.startup.DBResource;
+import com.pd.system.startup.SYSLoadManager;
+import com.pd.system.utils.DateTools;
+import com.pd.webservice.util.Base64Image;
+import com.pd.webservice.util.ObjectParser;
+import com.pd.webservice.util.StringUtil;
+
+/**
+ * 图片上传接口主键为外检编号或系统档案编号
+ * @author ywj
+ * 2014-8-2
+ */
+public class UploadPicCommandV2 extends AbstractCommandRequest {
+
+	protected final Log log = LogFactory.getLog(getClass());
+	private ArcBaseInfoService arcBaseInfoService = DAOFactory.getDao("arcBaseInfoService");
+	private Map<String, String> baseInfoMap;
+	private Map<String, String> picInfoMap;
+	private static final String QXZ = "请";//请选择下列框
+	
+	@Override
+	public String request(String requestXml) throws Exception {
+		
+		//1 解析机动车档案的基本信息,将信息存储档案基本信息中间表中。
+		baseInfoMap = ObjectParser.html2Map(requestXml, "baseinfo");
+		
+		//解析图片
+		List<Map<String, String>> list = ObjectParser.html2List(requestXml, "picinfo");
+		
+		if(list==null || list.size()==0){
+			//必要参数不能为空
+			return "0504";
+		}
+		
+		//0：业务档案初次扫描(默认)	1：历史档案重扫	2：业务档案重扫  	3:历史档案初扫
+		String scanMode = baseInfoMap.get("scanmode");
+		
+		String wjbh = baseInfoMap.get("wjbh");
+		if(StringUtils.isNotEmpty(wjbh)){
+			wjbh = wjbh.toUpperCase();
+		}
+		String ywlx = baseInfoMap.get("ywlx");
+		String jkxlh = baseInfoMap.get("jkxlh");
+		//arctype 1:业务档案   2 历史档案
+		String arctype = baseInfoMap.get("arctype");
+		//扫描人
+		String scanpeople =  list.get(0).get("scanpeople");	
+		//扫描人
+		String scanpeopleName = DBResource.getUser2CnNameMap().get(scanpeople);
+		//扫描人部门
+		String deptCode = DBResource.getUser2DeptCodeMap().get(scanpeople);
+		String xtdabh = baseInfoMap.get("xtdabh");
+		if(StringUtils.isNotEmpty(xtdabh)){
+			xtdabh = xtdabh.toUpperCase();
+		}
+		String uploadtimes = baseInfoMap.get("uploadtimes");
+		
+		String callNum = baseInfoMap.get("callnum");//叫号号码
+		
+		if (StringUtil.isEmpty(jkxlh)) {
+			//必要参数不能为空
+			return "0001";
+		}
+		
+		if(scanMode == null || "0".equals(scanMode)){//业务档案初扫
+			/*
+			 * 校验数据的有效性
+			 */
+			// arctype 1  业务档案
+			if ("1".equals(arctype)) {
+				if(StringUtils.isEmpty(wjbh)){
+					return "0001";
+				}
+			}
+						
+			List arcBaseInfoByXTDABH = arcBaseInfoService.getArcBaseInfoByXTDABHAndDALX(wjbh,arctype);
+			if(arcBaseInfoByXTDABH == null || arcBaseInfoByXTDABH.size() <= 0){//外检编号不存在
+				ArcBaseInfo arcBaseInfo = new ArcBaseInfo();
+				arcBaseInfo.setId(UUID.randomUUID().toString());
+				arcBaseInfo.setYwlx(ywlx);	
+				arcBaseInfo.setDalx(arctype);
+				arcBaseInfo.setXtdabh(wjbh);
+				arcBaseInfo.setCjr(scanpeople);
+				arcBaseInfo.setCjrmc(scanpeopleName);
+				arcBaseInfo.setCjsj(new Date());
+				arcBaseInfo.setDeptcode(deptCode);
+				arcBaseInfo.setDazt(ArcStatus.YSM);//档案状态：已扫描
+				arcBaseInfoService.insert(arcBaseInfo);
+				
+				insertArcStatusRecord(wjbh,scanpeople,scanpeopleName,new Date(),ArcStatus.YSM,"档案初扫");
+				
+				//return "0502";//系统中没有该数据	
+			}else{//外检编号存在
+				ArcBaseInfo arcBaseInfo = (ArcBaseInfo) arcBaseInfoByXTDABH.get(0);
+				arcBaseInfo.setDalx(arctype);//档案类型
+				arcBaseInfo.setYwlx(ywlx);//业务类型
+				arcBaseInfo.setCjr(scanpeople);//创建人
+				arcBaseInfo.setCjrmc(scanpeopleName);//创建人姓名
+				arcBaseInfo.setCjsj(new Timestamp(new Date().getTime()));//创建时间
+				arcBaseInfo.setDeptcode(deptCode);
+				//if(ArcStatus.YGD.equals(arcBaseInfo.getDazt())){//已归档后再扫描，即先办业务后扫描
+					
+				//}else{
+				arcBaseInfo.setDazt(ArcStatus.YSM);//档案状态：已扫描
+				//}
+				arcBaseInfoService.updateArcBaseInfoByXTDABH(arcBaseInfo);
+				
+				insertArcStatusRecord(wjbh,scanpeople,scanpeopleName,new Date(),ArcStatus.YSM,"档案初扫");
+			}
+				
+			//2 解析机动车档案的照片信息,将照片信息存入档案照片信息中间表中（如果有多张依次存入进去）。
+			Long startTime = System.currentTimeMillis();
+			System.out.println("开始上传图片 ================ ");
+			for (int i=0; i<list.size(); i++) {
+				picInfoMap = list.get(i);
+				ArcPicInfo arcPicInfo = new ArcPicInfo();
+				String id = UUID.randomUUID().toString();
+				arcPicInfo.setId(id);
+				arcPicInfo.setXtdabh(wjbh);
+				arcPicInfo.setYwlx(picInfoMap.get("ywlx"));
+				arcPicInfo.setTplx(picInfoMap.get("arctype"));
+				arcPicInfo.setSmr(picInfoMap.get("scanpeople"));
+				arcPicInfo.setSmrmc(scanpeopleName);
+				arcPicInfo.setSmsj(new Date());
+				arcPicInfo.setSmcs(uploadtimes);
+				arcPicInfo.setSfcs("0");
+				arcPicInfo.setPaperId(picInfoMap.get("paperid"));
+			
+				String picFileName = wjbh + "_" + picInfoMap.get("ywlx") + arcPicInfo.getPaperId() + "_" + 
+				                     String.valueOf(System.currentTimeMillis()); 
+				arcPicInfo.setPicFilename(picFileName);
+				
+				String picbase64 = picInfoMap.get("picbase64");
+				
+				//2.1 判断文件夹是否存在，不存在创建文件夹
+				File storePath = new File(SYSLoadManager.getPicStorePath());
+				// 如果文件夹不存在则创建
+				if (!storePath.exists() && !storePath.isDirectory()) {
+					log.info("创建目录-----------" + storePath.getAbsoluteFile());
+					storePath.mkdir();
+				} 
+				
+				String picDirectory = SYSLoadManager.getPicStorePath()  + DateTools.getYM();
+				arcPicInfo.setTplj(picDirectory + "/" + picFileName);
+				//2.2 判断文件夹是否存在，不存在创建文件夹
+				File file = new File(picDirectory);
+				// 如果文件夹不存在则创建
+				if (!file.exists() && !file.isDirectory()) {
+					log.info("创建目录-----------" + file.getAbsoluteFile());
+					file.mkdir();
+				} 
+				
+				Base64Image.GenerateImage(picbase64, picDirectory + "/" + picFileName);
+				arcBaseInfoService.insert(arcPicInfo);
+			}
+			Long endTime = System.currentTimeMillis();
+			System.out.println("上传图片完成 ================  总用时: " + (endTime - startTime) );
+			
+			//删除该叫号号码
+			/*String callNumDelete = "delete from ARC_CALL where CALLNUM='"+callNum+"' ";
+			jdbcTemplate.execute(callNumDelete);*/
+			
+		}else if("1".equals(scanMode)){
+			/*
+			 * 历史档案重扫
+			 */
+			//对必要参数进行验证
+			if (StringUtil.isEmpty(xtdabh)) {
+				return "0001";
+			}
+			
+			List arcBaseInfoByXTDABH = arcBaseInfoService.getArcBaseInfoByXTDABHAndDALX(xtdabh,arctype);
+			if(arcBaseInfoByXTDABH == null || arcBaseInfoByXTDABH.size() <= 0){
+				return "0502";//系统中没有该数据
+			}
+			List arcRescanInfoByXTDABH = arcBaseInfoService.getArcRescanInfoByXTDABH(xtdabh);
+			if(arcRescanInfoByXTDABH == null || arcRescanInfoByXTDABH.size() <= 0){
+				return "0502";//系统中没有该数据
+			}
+			ArcBaseInfo arcBaseInfo = (ArcBaseInfo) arcBaseInfoByXTDABH.get(0);
+			String dazt = arcBaseInfo.getDazt();
+			if(ArcStatus.SHWTG_YW.equals(dazt)){//归档前审核不通过才可以重扫
+				for (int i=0; i<list.size(); i++) {
+					picInfoMap = list.get(i);
+					String paperId = picInfoMap.get("paperid");
+					String picYwlx = picInfoMap.get("ywlx");
+					String scancount = picInfoMap.get("scancount");
+					String picFileName = xtdabh + "_" + picYwlx + paperId + "_" + String.valueOf(System.currentTimeMillis()); 
+					String picDirectory = SYSLoadManager.getPicStorePath() + DateTools.getYM();
+					String tplj = picDirectory + "/" + picFileName;
+					//更新照片表
+					String sql1 = "update ARC_PIC_INFO set YTP=TPLJ,PIC_FILENAME ='"+picFileName+"',sfcs='0',tplj='" + tplj  + "'" +
+							" where xtdabh='"+xtdabh+"' and paper_id='"+paperId+"' and ywlx= '" + picYwlx + "' and smcs = '" + scancount + "'" ;
+					//更新档案基本信息表
+					String sql2="update ARC_BASE_INFO set dazt ='" + ArcStatus.YSM + "'" + " where xtdabh='"+xtdabh+"'";	
+					String sql3="update ARC_RESCAN_INFO set ARC_STATUS='" + ArcStatus.ARC_YCS + "',SFYCS='1' where XTDABH='"+xtdabh+"'";
+					jdbcTemplate.update(sql1);
+					jdbcTemplate.update(sql2);
+					jdbcTemplate.update(sql3);
+					String picbase64 = picInfoMap.get("picbase64");
+					saveFileToDisk(DateTools.getYM(),picbase64,picFileName);
+				}
+			}else if(ArcStatus.ARC_CSSH.equals(dazt)){//归档后重扫
+				for (int i=0; i<list.size(); i++) {
+					picInfoMap = list.get(i);
+					String paperId = picInfoMap.get("paperid");
+					String picYwlx = picInfoMap.get("ywlx");
+					String scancount = picInfoMap.get("scancount");
+					String picFileName = xtdabh + "_" + picYwlx + paperId + "_" + String.valueOf(System.currentTimeMillis()); 
+					String picDirectory = SYSLoadManager.getPicStorePath() + DateTools.getYM();
+					String tplj = picDirectory + "/" + picFileName;
+					//更新照片表
+					String sql1 = "update ARC_PIC_INFO set YTP=TPLJ,PIC_FILENAME ='"+picFileName+"',sfcs='0',tplj='" + tplj  + "'" +
+							" where xtdabh='"+xtdabh+"' and paper_id='"+paperId+"' and ywlx= '" + picYwlx + "' and smcs = '" + scancount + "'" ;
+					//更新档案基本信息表
+					String sql2="update ARC_BASE_INFO set dazt ='" + ArcStatus.ARC_YCS + "'" + " where xtdabh='"+xtdabh+"'";	
+					String sql3="update ARC_RESCAN_INFO set ARC_STATUS='" + ArcStatus.ARC_YCS + "',SFYCS='1' where XTDABH='"+xtdabh+"'";
+					jdbcTemplate.update(sql1);
+					jdbcTemplate.update(sql2);
+					jdbcTemplate.update(sql3);
+					String picbase64 = picInfoMap.get("picbase64");
+					saveFileToDisk(DateTools.getYM(),picbase64,picFileName);
+				}
+			}
+			
+		}else if("2".equals(scanMode)){
+			/*
+			 * 业务档案重扫
+			 */
+			if ("1".equals(arctype)) {
+				if(StringUtils.isEmpty(wjbh)){
+					return "0001";
+				}
+			}
+			
+			List arcBaseInfoByXTDABH = arcBaseInfoService.getArcBaseInfoByXTDABHAndDALX(wjbh,arctype);
+			if(arcBaseInfoByXTDABH == null || arcBaseInfoByXTDABH.size() <= 0){
+				return "0502";//系统中没有该数据
+			}
+			List arcRescanInfoByXTDABH = arcBaseInfoService.getArcRescanInfoByXTDABH(wjbh);
+			if(arcRescanInfoByXTDABH == null || arcRescanInfoByXTDABH.size() <= 0){
+				return "0502";//系统中没有该数据
+			}
+			
+			ArcBaseInfo arcBaseInfo = (ArcBaseInfo) arcBaseInfoByXTDABH.get(0);
+			String dazt = arcBaseInfo.getDazt();
+			if(ArcStatus.SHWTG_YW.equals(dazt)){//归档前审核不通过才可以重扫
+				for (int i=0; i<list.size(); i++) {
+					picInfoMap = list.get(i);
+					String paperId = picInfoMap.get("paperid");
+					String picYwlx = picInfoMap.get("ywlx");
+					String scancount = picInfoMap.get("scancount");
+					String picFileName = wjbh + "_" + picYwlx + paperId + "_" + String.valueOf(System.currentTimeMillis()); 
+					String picDirectory = SYSLoadManager.getPicStorePath()  + DateTools.getYM();
+					String tplj = picDirectory + "/" + picFileName;
+					//更新照片表
+					String sql1 = "update ARC_PIC_INFO set YTP=TPLJ,PIC_FILENAME ='"+picFileName+"',sfcs='0',tplj='" + tplj  + "'" +
+							" where xtdabh='"+wjbh+"' and paper_id='"+paperId+"' and ywlx= '" + picYwlx + "' and smcs = '" + scancount + "'" ;
+					//更新档案基本信息表
+					String sql2="update ARC_BASE_INFO set dazt ='" + ArcStatus.YSM + "'" + " where xtdabh='"+wjbh+"'";	
+					String sql3="update ARC_RESCAN_INFO set ARC_STATUS='" + ArcStatus.ARC_YCS + "',SFYCS='1' where XTDABH='"+wjbh+"'";
+					jdbcTemplate.update(sql1);
+					jdbcTemplate.update(sql2);
+					jdbcTemplate.update(sql3);
+					String picbase64 = picInfoMap.get("picbase64");
+					saveFileToDisk(DateTools.getYM(),picbase64,picFileName);
+				}
+			}else if(ArcStatus.ARC_CSSH.equals(dazt)){//归档后重扫
+				for (int i=0; i<list.size(); i++) {
+					picInfoMap = list.get(i);
+					String paperId = picInfoMap.get("paperid");
+					String picYwlx = picInfoMap.get("ywlx");
+					String scancount = picInfoMap.get("scancount");
+					String picFileName = wjbh + "_" + picYwlx + paperId + "_" + String.valueOf(System.currentTimeMillis()); 
+					String picDirectory = SYSLoadManager.getPicStorePath()  + DateTools.getYM();
+					String tplj = picDirectory + "/" + picFileName;
+					//更新照片表
+					String sql1 = "update ARC_PIC_INFO set YTP=TPLJ,PIC_FILENAME ='"+picFileName+"',sfcs='0',tplj='" + tplj  + "'" +
+							" where xtdabh='"+wjbh+"' and paper_id='"+paperId+"' and ywlx= '" + picYwlx + "' and smcs = '" + scancount + "'" ;
+					//更新档案基本信息表
+					String sql2="update ARC_BASE_INFO set dazt ='" + ArcStatus.ARC_YCS + "'" + " where xtdabh='"+wjbh+"'";	
+					String sql3="update ARC_RESCAN_INFO set ARC_STATUS='" + ArcStatus.ARC_YCS + "',SFYCS='1' where XTDABH='"+wjbh+"'";
+					jdbcTemplate.update(sql1);
+					jdbcTemplate.update(sql2);
+					jdbcTemplate.update(sql3);
+					String picbase64 = picInfoMap.get("picbase64");
+					saveFileToDisk(DateTools.getYM(),picbase64,picFileName);
+				}
+			}
+								
+		}else if("3".equals(scanMode)){
+			
+			/*
+			 * 历史档案上传(初扫)
+			 */
+			
+			//对必要参数进行验证
+			if (StringUtil.isEmpty(xtdabh)) {
+				return "0001";
+			}
+			if(StringUtil.isEmpty(ywlx) || QXZ.equals(ywlx)){
+				return "0509";
+			} 
+			
+			List arcBaseInfoByXTDABH = arcBaseInfoService.getArcBaseInfoByXTDABHAndDALX(xtdabh,arctype);
+			if(arcBaseInfoByXTDABH == null || arcBaseInfoByXTDABH.size() <= 0){
+				return "0502";//系统中没有该数据
+			}
+			ArcBaseInfo arcBaseInfo = (ArcBaseInfo) arcBaseInfoByXTDABH.get(0);
+			arcBaseInfo.setDalx(arctype);//档案类型
+			arcBaseInfo.setYwlx(ywlx);//业务类型
+			arcBaseInfo.setCjr(scanpeople);//创建人
+			arcBaseInfo.setCjrmc(scanpeopleName);//创建人姓名
+			arcBaseInfo.setCjsj(new Timestamp(new Date().getTime()));//创建时间
+			arcBaseInfo.setDeptcode(deptCode);
+			//arcBaseInfo.setDazt(ArcStatus.YSM);//档案状态：已扫描
+			arcBaseInfo.setDazt(ArcStatus.YGD);//档案状态：已归档，历史档案无需审核和归档，直接可以查看
+			arcBaseInfoService.updateArcBaseInfoByXTDABH(arcBaseInfo);
+					
+			//2 解析机动车档案的照片信息,将照片信息存入档案照片信息中间表中（如果有多张依次存入进去）。
+			Long startTime = System.currentTimeMillis();
+			System.out.println("开始上传图片 ================ ");
+			for (int i=0; i<list.size(); i++) {
+				picInfoMap = list.get(i);
+				ArcPicInfo arcPicInfo = new ArcPicInfo();
+				String id = UUID.randomUUID().toString();
+				arcPicInfo.setId(id);
+				arcPicInfo.setXtdabh(xtdabh);
+				arcPicInfo.setYwlx(picInfoMap.get("ywlx"));
+				arcPicInfo.setTplx(picInfoMap.get("arctype"));
+				arcPicInfo.setSmr(picInfoMap.get("scanpeople"));
+				arcPicInfo.setSmrmc(scanpeopleName);
+				arcPicInfo.setSmsj(new Date());
+				arcPicInfo.setSmcs(uploadtimes);
+				arcPicInfo.setSfcs("0");
+				arcPicInfo.setPaperId(picInfoMap.get("paperid"));
+			
+				String picFileName = arcBaseInfo.getXtdabh() + "_" + arcBaseInfo.getYwlx() + arcPicInfo.getPaperId() + "_" + 
+				                     String.valueOf(System.currentTimeMillis()); 
+				arcPicInfo.setPicFilename(picFileName);
+				
+				String picbase64 = picInfoMap.get("picbase64");
+				
+				//2.1 判断文件夹是否存在，不存在创建文件夹
+				File storePath = new File(SYSLoadManager.getPicStorePath());
+				// 如果文件夹不存在则创建
+				if (!storePath.exists() && !storePath.isDirectory()) {
+					log.info("创建目录-----------" + storePath.getAbsoluteFile());
+					storePath.mkdir();
+				} 
+				
+				String picDirectory = SYSLoadManager.getPicStorePath() + DateTools.getYM();
+				arcPicInfo.setTplj(picDirectory + "/" + picFileName);
+				//2.2 判断文件夹是否存在，不存在创建文件夹
+				File file = new File(picDirectory);
+				// 如果文件夹不存在则创建
+				if (!file.exists() && !file.isDirectory()) {
+					log.info("创建目录-----------" + file.getAbsoluteFile());
+					file.mkdir();
+				} 
+				
+				Base64Image.GenerateImage(picbase64, picDirectory + "/" + picFileName);
+				arcBaseInfoService.insert(arcPicInfo);
+			}
+			Long endTime = System.currentTimeMillis();
+			System.out.println("上传图片完成 ================  总用时: " + (endTime - startTime) );				
+		}
+		header = ObjectParser.getScanXMLHead("1","成功","1");
+		foot = ObjectParser.getScanXMLFoot();
+		return header + foot;
+	}
+	
+	private void insertArcStatusRecord(String xtdabh, String czr,
+			String czrmc, Date czsj, String statusCode, String bz) {
+		ArcStatusRecord arcStatusRecord = new ArcStatusRecord();
+		arcStatusRecord.setId(UUID.randomUUID().toString());
+		arcStatusRecord.setXtdabh(xtdabh);
+		arcStatusRecord.setCzr(czr);
+		arcStatusRecord.setCzrmc(czrmc);
+		arcStatusRecord.setCzsj(czsj);
+		arcStatusRecord.setStatusCode(statusCode);
+		arcStatusRecord.setBz(bz);
+		arcBaseInfoService.insertArcStatusRecord(arcStatusRecord );
+		
+	}
+
+	public static void main(String[] args) {
+		String str =  "<?xml version='1.0' encoding='UTF-8'?><request><header><command>uploadPicByWjbh</command></header><parameter><wjbh>123456</wjbh><roleid>65</roleid><ywlx>A</ywlx><scanmode>1</scanmode><picinfo></picinfo></parameter></request>";
+		try {
+			System.out.println(new UploadPicCommandV2().request(str));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 保存图片到磁盘
+	 * @param deptArea 行政区划
+	 * @param picbase64 照片base64编码
+	 * @param picFileName 照片文件名
+	 * 
+	 * @author ywj
+	 * 2014-8-2
+	 */
+	public void saveFileToDisk(String picDir,String picbase64,String picFileName){
+		//2.1 判断文件夹是否存在，不存在创建文件夹
+		File storePath = new File(SYSLoadManager.getPicStorePath());
+		// 如果文件夹不存在则创建
+		if (!storePath.exists() && !storePath.isDirectory()) {
+			log.info("创建目录-----------" + storePath.getAbsoluteFile());
+			storePath.mkdir();
+		} 
+		
+		String picDirectory = SYSLoadManager.getPicStorePath() + picDir;
+		
+		//2.2 判断文件夹是否存在，不存在创建文件夹
+		File file = new File(picDirectory);
+		// 如果文件夹不存在则创建
+		if (!file.exists() && !file.isDirectory()) {
+			log.info("创建目录-----------" + file.getAbsoluteFile());
+			file.mkdir();
+		} 
+		
+		Base64Image.GenerateImage(picbase64, picDirectory + "/" + picFileName);
+	}
+}
+
+

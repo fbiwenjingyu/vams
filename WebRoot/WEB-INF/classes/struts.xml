@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN"
+    "http://struts.apache.org/dtds/struts-2.1.7.dtd">
+
+<struts>
+	<!-- base configuration -->
+	<constant name="struts.devMode" value="true" />
+	<constant name="struts.i18n.encoding" value="UTF-8" />
+	<constant name="struts.enable.DynamicMethodInvocation" value="true" />
+	<constant name="struts.multipart.maxSize" value="9000000000"/> 
+	
+    <!-- 全局包 -->
+    <package name="vams-default" extends="json-default">
+    	<!-- 定义拦截器 -->
+    	<interceptors>
+			<!-- 全局异常监测拦截器 -->
+			<interceptor name="globalExceptionInterceptor" class="com.pd.system.control.GlobalExceptionInterceptor"/>
+			<!-- session转换拦截器 -->
+			<interceptor name="sessionInterceptor" class="com.pd.system.control.SessionInterceptor"/>
+			<!-- 配置拦截器栈 -->
+			<interceptor-stack name="vams_stack">
+				<interceptor-ref name="defaultStack"/><!-- 必须引用默认拦截器，否则将出现struts异常 -->
+				<interceptor-ref name="globalExceptionInterceptor"/>
+				<interceptor-ref name="sessionInterceptor"/>
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="vams_stack"/><!-- 替换struts2默认的拦截器调用 -->
+		
+    	<!-- 定义全局返回值 -->
+		<global-results>
+			<result name="error">/system/message/error.jsp</result>
+			<result name="warning">/system/message/warning.jsp</result>
+			<result name="json">/json.jsp</result>
+			<result name="struts_json" type="json">
+				<param name="root">retJsonObject</param>
+			</result>
+		</global-results>
+		
+	</package>
+	
+	
+	<!-- include action file  -->
+	<include file="handler/system.xml" />
+	<include file="handler/right.xml" />
+	<include file="handler/base.xml" />	
+	<include file="handler/scanWebservice.xml" />
+	<include file="handler/wjyw.xml" />	
+	<include file="handler/wjpda.xml" />	
+	<include file="handler/arc.xml" />	
+	<include file="handler/tjcx.xml" />	
+	<include file="handler/cwgl.xml"/>
+	<include file="handler/swgl.xml"/>
+</struts>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<beans>
+	
+	<!-- 其他 -->
+	<bean id="resAction" class="com.pd.system.res.ResAction" scope="prototype">
+	</bean>
+	<bean id="cacheManageAction" class="com.pd.system.res.CacheManageAction" scope="prototype">
+	</bean>
+	
+	
+	<!-- 标签打印 -->
+	<bean id="barcodeAction" class="com.pd.system.res.BarcodeAction" scope="prototype">
+		<property name="pubArcBaseInfoService" ref="pubArcBaseInfoService"/>
+		<property name="barcodeService" ref="barcodeService"/>
+	</bean>
+	<bean id="barcodeService" class="com.pd.system.res.BarcodeService">
+		<property name="usersDAO" ref="userDAO"/>
+		<property name="ycInfoDAO" ref="ycInfoDAO"/>
+	</bean>
+	
+</beans>

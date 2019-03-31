@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<beans>
+	<!--spring 管理权限service业务逻辑层-->
+	<bean id="attrService" class="com.pd.base.service.impl.AttrServiceImpl">
+		<property name="attrDAO" ref="attrDAO"></property>
+	</bean>
+	
+	<bean id="codeSetService" class="com.pd.base.service.impl.CodeSetServiceImpl">
+		<property name="codeSetDAO" ref="codeSetDAO"></property>
+	</bean>
+		
+	<bean id="flowService" class="com.pd.base.service.impl.FlowServiceImpl">
+		<property name="flowDAO" ref="flowDAO"></property>
+		<property name="codeSetDAO" ref="codeSetDAO"></property>
+	</bean>
+		
+	<bean id="paperService" class="com.pd.base.service.impl.PaperServiceImpl">
+		<property name="paperDAO" ref="paperDAO"></property>
+	</bean>
+		
+	<bean id="seclevelService" class="com.pd.base.service.impl.SeclevelServiceImpl">
+		<property name="seclevelDAO" ref="seclevelDAO"></property>
+	</bean>
+		
+	<bean id="typeSetService" class="com.pd.base.service.impl.TypeSetServiceImpl">
+		<property name="typeSetDAO" ref="typeSetDAO"></property>
+	</bean>
+</beans>

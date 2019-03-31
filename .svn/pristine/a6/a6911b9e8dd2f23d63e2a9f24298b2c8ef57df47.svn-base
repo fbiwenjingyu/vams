@@ -1,0 +1,141 @@
+<%@ page language="java" pageEncoding="UTF-8"%>
+<%
+String path = request.getContextPath();
+String preAction = "dept";
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>部门机构添加修改页面</title>
+<%@ include file="/common/meta.jsp"%>
+<%@ include file="/common/taglib.jsp"%>
+<script language="javascript">
+	  function submitForm(update){
+		var valid = $("#form").validationEngine({returnIsValid: true});
+		if(valid){
+			if(update == "update"){
+		  		form.action = "<%=path %>/<%=preAction %>!update.action";
+		  		top.Dialog.confirm('您确定修改吗?',function(){
+					form.submit();
+                	top.Dialog.close();
+                	},
+                	function(){
+                    	top.Dialog.close();
+                    });
+		  	}else{
+		  		form.action = "<%=path %>/<%=preAction %>!add.action";
+		  		form.submit();
+		  	}
+		  	
+		}else{
+		    top.Dialog.alert('表单填写不正确');
+		} 
+	  }
+	  
+	  $.ajax({
+	    	type:"POST",
+	    	url:"dept!getSelect.action",
+	    	//dataType:"json",
+	    	success:function(data){
+	    		var upcode = "${entity.upcode}";
+	    		var seldata = "{\"list\":"+data+"}";
+	    		$("#upcode").data("data",JSON.parse(seldata));
+	    		$("#upcode").render(); 
+	    		$("#upcode").setValue(upcode);
+	    		//$.each(data,function(i,n){
+	    		//	if(upcode == n.id){
+	    		//		$("#upcode").append("<option value='"+n.deptcode+"' selected='selected'>"+n.deptname+"</option>");
+	    		//	}else{
+	    		//		$("#upcode").append("<option value='"+n.deptcode+"'>"+n.deptname+"</option>");
+	    		//	}
+	    		//});
+	    	}
+	    });
+
+		$.ajax({
+	    	type:"POST",
+	    	url:"codeSet!getSelectByCode.action?entity.type=1",
+	    	success:function(data){
+	    		var deptarea= "${entity.deptarea}";
+    	    	var seldata = "{\"list\":"+data+"}";
+	    		$("#deptarea").data("data",JSON.parse(seldata));
+	    		$("#deptarea").render(); 
+	    		$("#deptarea").setValue(deptarea);
+	    	}
+	    });
+
+	  $(function(){
+	    	var update = "${update}";
+	    	if(update ==""){
+	      	$("input[name='entity.deptcode']").blur(function(){
+	      		var code = this.value;
+	      		$.ajax({
+	      			url:"dept!isExists.action",
+	      			data:"entity.deptcode="+code,
+	      			type:"POST",
+	      			dataType:"text",
+	      			success:function(data){
+	      				if(data==1){
+	      					$("#msg").html("该机构代码已经存在!");
+	      					$("input[name='entity.deptcode']").focus();
+	      					$("input[name='entity.deptcode']").val("");
+	      				}else{
+	      					$("#msg").html("");
+		      			}
+	      			}
+	      		});
+	      	});
+  	
+      }
+	    });
+</script>
+</head>
+<body   onkeydown="return onkeydownBody()">
+ <form id="form" method="post" action="" name="form"  target="frmright">
+	<input type="hidden" name="entity.f5" value="${entity.f5 }"/>
+	<input type="hidden" name="entity.f4" value="${entity.f4 }"/>
+	<input type="hidden" name="entity.f3" value="${entity.f3}"/>
+	<!--<input type="hidden" name="entity.f1" value="${entity.f1 }"/>
+	--><input type="hidden" name="entity.f2" value="${entity.f2 }"/>
+	<table class="tableStyle" formMode="line">
+       		<tr>
+				<td  class="ali03">机构代码：</td><td><input type="text"  name="entity.deptcode" value="${entity.deptcode}" class="validate[required,length[0,10]]" <c:if test="${update=='update'}">readonly style='background:#E6E6E6'</c:if>/><span class="star">*</span><span id="msg"></span></td>
+				<td  class="ali03">上级机构：</td><td><select id="upcode" prompt="请选择" name="entity.upcode" ></select></td>
+			</tr>
+       		<tr>
+				<td  class="ali03">机构名称：</td><td><input type="text"  name="entity.deptname" value="${entity.deptname}" class="validate[required,length[0,25]]" /><span class="star">*</span></td>
+				<td  class="ali03">机构类型：</td><td><input type="text"  name="entity.depttype" value="${entity.depttype}" class="validate[custom[onlyNumber],length[0,8]]" /></td>
+			</tr>
+       		<tr>
+				<td  class="ali03">行政区划：</td><td><select id="deptarea" prompt="请选择" name="entity.deptarea" class="validate[required]"></select><span class="star">*</span></td>
+				<td  class="ali03">联系地址：</td><td><input type="text"  name="entity.linkadd" value="${entity.linkadd}" class="validate[length[0,100]]" /></td>
+			</tr>
+			<tr>
+				<td  class="ali03">联系电话：</td><td><input type="text"  name="entity.linktel" value="${entity.linktel}" class="validate[custom[telephone]]" /></td>
+				<td  class="ali03">网址：</td><td><input type="text"  name="entity.linkweb" value="${entity.linkweb}" class="validate[length[0,25]]" /></td>
+			</tr>
+			<tr>
+				<td  class="ali03">邮箱：</td><td><input type="text"  name="entity.linkmail" value="${entity.linkmail}" class="validate[custom[email]]" /></td>
+				<td  class="ali03">描述：</td><td><textarea name="entity.deptdesc" class="validate[length[0,100]]" >${entity.deptdesc}</textarea></td>
+			</tr>
+				<tr>
+				<td  class="ali03">扫描类型：</td>
+				<td>
+					<select name="entity.f1">
+						<option value="">请选择</option>
+						<option value="0" <c:if test="${entity.f1=='0'}">selected</c:if>>先扫</option>
+						<option value="1" <c:if test="${entity.f1=='1'}">selected</c:if>>后扫</option>
+					</select>
+				</td>
+				
+			</tr>
+			<tr>
+				<td colspan="4" align="center">
+				<button type="button"  onclick="submitForm('${update}')"><span class="icon_ok">提交</span></button>
+				<button type="button" onclick="closeWin()"><span class="icon_clear">取消</span></button>
+				</td>
+			</tr>
+       		</table>
+    </form>
+</body>
+</html>

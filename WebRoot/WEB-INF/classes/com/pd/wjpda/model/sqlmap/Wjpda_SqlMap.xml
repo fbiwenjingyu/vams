@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Wjpda">
+  <resultMap class="com.pd.wjpda.model.WjpdaVO" id="abatorgenerated_WjpdaVOResult">
+    <result column="TAKECODE" jdbcType="VARCHAR" property="takeCode" />
+    <result column="TAKE_NAME" jdbcType="VARCHAR" property="takeName" />
+    <result column="PIC_STATUS" jdbcType="VARCHAR" property="picStatus" />
+    <result column="XTDABH" jdbcType="VARCHAR" property="xtdabh" />
+    <result column="HPZL" jdbcType="VARCHAR" property="hpzl"/>
+    <result column="YWLX" jdbcType="VARCHAR" property="ywlx"/>
+  </resultMap>
+
+	<!-- 查找没有上传成功的图片信息 -->
+	<select id="findPicInfos" parameterClass="com.pd.wjpda.model.WjpdaVO" resultClass="com.pd.wjpda.model.WjpdaVO">
+		select p.XTDABH,p.pic_status as picStatus,y.takecode,y.take_name as takeName from yc_info_pic p,yc_paper y where p.takecode=y.takecode  
+		<dynamic>
+			<isNotNull prepend="AND" property="xtdabh">
+				p.XTDABH=#xtdabh#
+			</isNotNull>
+			<isNotNull prepend="AND" property="picStatus">
+				p.PIC_STATUS=#picStatus#
+			</isNotNull>
+		</dynamic>
+	</select>
+
+
+	<!-- 通过业务类型和好牌种类查找需要拍照那些相片 -->
+	<select id="getNeedTakePic" parameterClass="com.pd.wjpda.model.WjpdaVO" resultClass="com.pd.wjpda.model.WjpdaVO">
+		select p.takecode,p.take_name as takeName  from yc_type_paper t,yc_paper p where p.takecode= t.takecode
+		<dynamic>
+			<isNotNull prepend="AND" property="hpzl">
+				t.hpzl=#hpzl#
+			</isNotNull>
+			<isNotNull prepend="AND" property="ywlx">
+			 	t.ywlx=#ywlx#
+			</isNotNull>
+		order by t.takecode
+		</dynamic>
+	</select>
+	
+	
+</sqlMap>

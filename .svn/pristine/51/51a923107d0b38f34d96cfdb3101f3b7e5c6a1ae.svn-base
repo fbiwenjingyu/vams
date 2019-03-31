@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN"
+    "http://struts.apache.org/dtds/struts-2.1.7.dtd">
+
+<struts>
+    <package name="wjyw" namespace="/" extends="vams-default">
+		<action name="ycPaper" class="ycPaperAction">
+			<result name="ycPaper_query">/wjyw/ycPaper_query.jsp</result>
+		</action>
+		<action name="ycTypePaper" class="ycTypePaperAction">
+			<result name="ycTypePaper_query">/wjyw/ycTypePaper_query.jsp</result>
+			<result name="ycTypePaper_add">/wjyw/ycTypePaper_add.jsp</result>
+		</action>
+		
+		<action name="ycInfo" class="ycInfoAction">
+			<result name="ycInfo_query">/wjyw/ycInfo_query.jsp</result>
+			<result name="printCode">/wjyw/printCode.jsp</result>
+			<result name="printCodeSingleY">/wjyw/printCodeSingleY.jsp</result>
+			<result name="printCodeSingleN">/wjyw/printCodeSingleN.jsp</result>
+			<result name="printCodeDoubleY">/wjyw/printCodeDoubleY.jsp</result>
+			<result name="printCodeDoubleN">/wjyw/printCodeDoubleN.jsp</result>
+			<result name="printCodeBatchY">/wjyw/printCodeBatchY.jsp</result>
+			<result name="printCodeBatchN">/wjyw/printCodeBatchN.jsp</result>
+			<result name="ycInfo_check">/wjyw/ycInfo_check.jsp</result>
+			<result name="ycInfo_codeQuery">/wjyw/ycInfo_codeQuery.jsp</result>
+			<result name="wjcyd_print">/wjyw/wjcyd_print.jsp</result>
+			<result name="ycInfo_checkView">/wjyw/ycInfo_checkView.jsp</result>
+			<result name="ycInfo_view">/wjyw/ycInfo_view.jsp</result>
+			<result name="ycInfo_picView">/wjyw/ycInfo_picView.jsp</result>
+			<result name="ycInfo_hzd">/wjyw/ycInfo_hzd.jsp</result>
+			<result name="wjcyd_print">/wjyw/wjcyd_print.jsp</result>
+			<result name="ycInfo_randomQuery">/wjyw/ycInfo_randomQuery.jsp</result>	
+			
+		</action>
+		
+		<action name="ycInfoBarcode" class="ycInfoBarcodeAction">
+			<result name="ycInfo_barCode">/wjyw/ycInfo_barCode.jsp</result>
+		</action>
+	</package>
+	
+</struts>
+

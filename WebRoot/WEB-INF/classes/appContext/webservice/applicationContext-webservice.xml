@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<beans>
+	
+	<!-- 扫描客户端所调用的Action-->
+	<bean id="ScanAction" class="com.pd.webservice.scan.ScanAction" scope="prototype"/>
+	
+	<!-- 档案对外公布的接口Action-->
+	<bean id="pubAction" class="com.pd.webservice.pub.PubAction" scope="prototype">
+		<property name="arcBaseInfoService" ref="arcBaseInfoService"/>
+		<property name="ycInfoPicService" ref="ycInfoPicService"/>
+	</bean>
+</beans>

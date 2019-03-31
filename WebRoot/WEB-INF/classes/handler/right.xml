@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN"
+    "http://struts.apache.org/dtds/struts-2.1.7.dtd">
+
+<struts>
+    <package name="right" namespace="/" extends="vams-default">
+		<action name="role" class="roleAction">
+			<result name="role_list">/right/role_list.jsp</result>
+		</action>
+		<action name="dept" class="deptAction">
+			<result name="dept_list">/right/dept_list.jsp</result>
+		</action>
+		<action name="resources" class="resourcesAction">
+			<result name="resources_list">/right/resources_list.jsp</result>
+			<result name="main">/system/layout/main.jsp</result>
+			<result name="icon">/right/icon_show.jsp</result>
+		</action>
+		<action name="roleRes" class="roleResAction">
+			<result name="main">/system/layout/main.jsp</result>
+		</action>
+		<action name="users" class="usersAction">
+			<result name="users_list">/right/users_list.jsp</result>
+		</action>
+		<action name="log" class="com.pd.right.action.LogAction">
+			<result name="log_list">/right/log_list.jsp</result>
+		</action>
+		<action name="login" class="loginAction">
+			<result name="login">/system/login/index.jsp</result>
+			<result name="main" type="redirect">/roleRes!getRoleRes.action</result>
+			<result name="admin" type="redirect">/resources!getRoleRes.action</result>
+		</action>
+	</package>
+</struts>
+

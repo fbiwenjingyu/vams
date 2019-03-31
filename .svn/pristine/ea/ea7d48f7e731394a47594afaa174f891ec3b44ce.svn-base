@@ -1,0 +1,26 @@
+#######Console Appender Settings##########
+log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
+log4j.appender.CONSOLE.Target=System.out
+log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
+log4j.appender.CONSOLE.layout.ConversionPattern=[%t] %-d{yyyy-MM-dd HH\:mm\:ss} [%c]-[%p] %m%n
+
+#######Rolling File Appender Settings#######
+log4j.appender.ROLLING_FILE=org.apache.log4j.RollingFileAppender
+log4j.appender.ROLLING_FILE.Append=true
+log4j.appender.ROLLING_FILE.File=log/vams.log
+log4j.appender.ROLLING_FILE.MaxBackupIndex=100
+log4j.appender.ROLLING_FILE.MaxFileSize=500MB
+log4j.appender.ROLLING_FILE.Threshold=DEBUG
+log4j.appender.ROLLING_FILE.layout=org.apache.log4j.PatternLayout
+log4j.appender.ROLLING_FILE.layout.ConversionPattern=[%t] %-d{yyyy-MM-dd HH\:mm\:ss} [%c]-[%p] %m%n
+
+#######Global Settings#############
+log4j.appender.Threshold=INFO
+log4j.logger.com.pd=DEBUG
+#log4j.rootLogger
+log4j.rootCategory=ERROR,CONSOLE,ROLLING_FILE
+
+############## print ibatic SQL ###################
+log4j.logger.java.sql=DEBUG
+log4j.logger.com.sun=INFO
+#log4j.logger.org.apache=DEBUG

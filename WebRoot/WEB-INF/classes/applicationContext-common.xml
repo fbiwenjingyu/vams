@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
+	
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+		<!--
+		<property name="url" value="jdbc:oracle:thin:@10.105.113.80:1521:orcl" />
+		<property name="username" value="vams2" />
+		<property name="password" value="vams2" />
+		-->
+		
+		<property name="url" value="jdbc:oracle:thin:@127.0.0.1:1521:orcl" />
+		<property name="username" value="vamsbm3" />
+		<property name="password" value="vamsbm3" />
+		
+		<!--
+		<property name="url" value="jdbc:oracle:thin:@192.168.1.207:1521:orcl" />
+		<property name="username" value="vamsbm3" />
+		<property name="password" value="vamsbm3" />
+		-->
+		<!-- Connection Pooling Info -->
+		<property name="initialSize" value="15" />
+		<property name="maxActive" value="50" />		
+		<property name="maxIdle" value="30" />
+
+
+		<property name="maxWait" value="30000" />
+		<!-- Use of the validation query can be problematic. If you have difficulty, try without it. -->
+		<property name="validationQuery" value="select null from dual" />
+		<property name="poolPreparedStatements" value="true" />
+		<property name="defaultAutoCommit" value="true" />
+		<!--  
+		<property name="logAbandoned" value="false" />
+		<property name="removeAbandoned" value="true" />
+		<property name="removeAbandonedTimeout" value="300" />
+		-->
+		<!--  
+		<property name="defaultTransactionIsolation" value="" />
+		-->
+	</bean>
+	
+	<!-- 收费系统数据库连接 -->
+	<bean id="dataSource1" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+		
+		<!-- 
+		<property name="url" value="jdbc:oracle:thin:@10.105.113.80:1521:orcl" />
+		<property name="username" value="veh_admin" />
+		<property name="password" value="oracleadmin" />
+		 -->
+		
+		<property name="url" value="jdbc:oracle:thin:@127.0.0.1:1521:orcl" />
+		<property name="username" value="vamsbm3" />
+		<property name="password" value="vamsbm3" />
+       
+        <!-- 
+       	<property name="url" value="jdbc:oracle:thin:@127.0.0.1:1521:orcl" />
+		<property name="username" value="vamsbm3" />
+		<property name="password" value="vamsbm3" />
+        -->
+		<!-- Connection Pooling Info -->
+
+		<property name="initialSize" value="5" />
+		<property name="maxActive" value="10" />
+		<property name="maxIdle" value="5" />
+
+		<property name="maxWait" value="30000" />
+		<!-- Use of the validation query can be problematic. If you have difficulty, try without it. -->
+		<property name="validationQuery" value="select null from dual" />
+		<property name="poolPreparedStatements" value="true" />
+		<property name="defaultAutoCommit" value="true" />
+		<!--  
+		<property name="logAbandoned" value="false" />
+		<property name="removeAbandoned" value="true" />
+		<property name="removeAbandonedTimeout" value="300" />
+		-->
+		<!--  
+		<property name="defaultTransactionIsolation" value="" />
+		-->
+	</bean>
+	
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate" abstract="false">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	
+	<bean id="jdbcTemplate1" class="org.springframework.jdbc.core.JdbcTemplate" abstract="false">
+		<property name="dataSource" ref="dataSource1"></property>
+	</bean>
+	
+	<!-- spring上下文注入 -->
+	<bean id="daoFactory" class="com.pd.system.framework.DAOFactory" abstract="false">
+		<property name="jdbcTemplate" ref="jdbcTemplate"/>
+	</bean>
+	
+  <!-- 配置事务管理 -->
+  <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <property name="dataSource" ref="dataSource"/>
+  </bean>
+	
+    <!--spring整合ibatis -->  
+	<bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation">
+			<value>classpath:sqlMapConfig.xml</value>
+		</property>
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+        <tx:attributes>
+            <tx:method name="*" propagation="REQUIRED" />
+        </tx:attributes>
+    </tx:advice>
+    
+    <aop:config>
+        <aop:pointcut id="interceptorPointCuts"
+            expression="execution(* com.pd.*.service..*.*(..)) || execution(* com.pd.webservice.scan.commands.*.*(..)) " />
+        <aop:advisor advice-ref="txAdvice"
+            pointcut-ref="interceptorPointCuts" />        
+    </aop:config>      
+	
+	<!-- 导入spring配置 -->
+	
+	<!-- 基础服务 -->
+	<import resource="appContext/base/applicationContext-base-bean.xml"/>
+	<import resource="appContext/base/applicationContext-base-service.xml"/>
+	<import resource="appContext/base/applicationContext-base-action.xml"/>
+	
+	<!-- 权限管理 -->
+	<import resource="appContext/right/applicationContext-right-bean.xml"/>
+	<import resource="appContext/right/applicationContext-right-service.xml"/>
+	<import resource="appContext/right/applicationContext-right-action.xml"/>
+	
+	<!-- web service扫描客户端接口 -->
+	<import resource="appContext/webservice/applicationContext-webservice.xml"/>
+
+	<!-- 外检业务管理 -->
+	<import resource="appContext/wjyw/applicationContext-wjyw-bean.xml"/>
+	<import resource="appContext/wjyw/applicationContext-wjyw-service.xml"/>
+	<import resource="appContext/wjyw/applicationContext-wjyw-action.xml"/>
+
+	<!-- PDA外检 -->
+	<import resource="appContext/wjpda/applicationContext-wjpda-bean.xml"/>
+	<import resource="appContext/wjpda/applicationContext-wjpda-service.xml"/>
+	<import resource="appContext/wjpda/applicationContext-wjpda-action.xml"/>
+	
+	<!-- 外检业务 -->
+	<import resource="appContext/wjyw/applicationContext-wjyw-bean.xml"/>
+	<import resource="appContext/wjyw/applicationContext-wjyw-service.xml"/>
+	<import resource="appContext/wjyw/applicationContext-wjyw-action.xml"/>
+	
+	<!-- 业务管理 -->
+	<import resource="appContext/arc/applicationContext-arc-bean.xml"/>
+	<import resource="appContext/arc/applicationContext-arc-service.xml"/>
+	<import resource="appContext/arc/applicationContext-arc-action.xml"/>
+	
+	<!-- 实物管理 -->
+	<import resource="appContext/swgl/applicationContext-swgl-bean.xml"/>
+	<import resource="appContext/swgl/applicationContext-swgl-service.xml"/>
+	<import resource="appContext/swgl/applicationContext-swgl-action.xml"/>
+	
+	<!-- 储位管理 -->
+	<import resource="appContext/cwgl/applicationContext-cwgl-bean.xml"/>
+	<import resource="appContext/cwgl/applicationContext-cwgl-service.xml"/>
+	<import resource="appContext/cwgl/applicationContext-cwgl-action.xml"/>
+	
+	<!-- 统计查询 -->
+	<import resource="appContext/tjcx/applicationContext-tjcx-action.xml"/>
+	
+	<!-- 定时任务 -->
+	<import resource="appContext/quartz/applicationContext-quartz.xml"/>
+	
+	<!-- 系统 -->
+	<import resource="appContext/applicationContext-system-all.xml"/>
+	
+</beans>

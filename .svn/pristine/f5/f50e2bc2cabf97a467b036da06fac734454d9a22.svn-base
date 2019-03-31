@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<beans>
+	<!-- spring管理struts的的配置文件-->
+	<bean id="arcBaseInfoAction" class="com.pd.arc.action.ArcBaseInfoAction" scope="prototype">
+		<property name="arcBaseInfoService"><ref bean="arcBaseInfoService"/></property>
+		<property name="ycInfoPicService"><ref bean="ycInfoPicService"/></property>
+		<property name="ycInfoService"><ref bean="ycInfoService"/></property>
+		<property name="arcReScanInfoService"><ref bean="arcReScanInfoService"/></property>
+		<property name="jdbcTemplate"><ref bean="jdbcTemplate"/></property>
+		<property name="jdbcTemplate1" ref="jdbcTemplate1"></property>
+	</bean>
+	
+	<!-- arc查询 -->
+	<bean id="arcQueryAction" class="com.pd.arc.action.ArcQueryAction" scope="prototype">
+		<property name="arcQueryService" ref="arcQueryService"/>
+	</bean>
+	
+	
+</beans>

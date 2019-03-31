@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE abatorConfiguration PUBLIC "-//Apache Software Foundation//DTD Abator for iBATIS Configuration 1.0//EN" "http://ibatis.apache.org/dtd/abator-config_1_0.dtd" >
+<!-- 
+  http://ibatis.apache.org/docs/tools/abator/
+ -->
+<abatorConfiguration>
+	<abatorContext>
+		<!-- server configuration info -->
+		<!--利用ibatis插件生成model dao相关代码-->
+		<jdbcConnection driverClass="oracle.jdbc.driver.OracleDriver" connectionURL="jdbc:oracle:thin:@192.168.1.254:1521:jjx" userId="vamsbm" password="vamsbm" >
+           <classPathEntry location="E:\\oracle\\product\\10.2.0\db_1\\jdbc\lib\\ojdbc14.jar" />
+        </jdbcConnection>
+        
+		<javaModelGenerator targetPackage="com.pd.arc.model" targetProject="bmvams" >
+		   <property name="enableSubPackages" value="true"/>
+		</javaModelGenerator>  
+		<sqlMapGenerator targetPackage="com.pd.arc.model.sqlmap" targetProject="bmvams" >
+		   <property name="enableSubPackages" value="true"/>
+		</sqlMapGenerator>
+		<daoGenerator targetPackage="com.pd.arc.dao.impl" targetProject="bmvams" type="spring" >
+           <property name="enableSubPackages" value="true"/>
+		</daoGenerator>
+
+		
+		<!-- <table tableName="ARC_BASE_INFO" catalog="jjx" />-->
+		<table tableName="ARC_STATUS_RECORD" catalog="jjx" />
+
+		
+
+	</abatorContext>
+</abatorConfiguration>
+

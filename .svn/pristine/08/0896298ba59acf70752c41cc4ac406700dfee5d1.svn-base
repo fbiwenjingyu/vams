@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<beans>
+	<!--spring 管理权限service业务逻辑层-->
+	
+	<bean id="wjpdaService" class="com.pd.wjpda.service.impl.WjpdaServiceImpl">
+		<property name="userDao" ref="userDAO"></property>
+		<property name="ycInfoDAO" ref="ycInfoDAO"></property>
+		<property name="wjpdaDAO" ref="wjpdaDAO"></property>
+		<property name="ycInfoPicDAO" ref="ycInfoPicDAO"></property>
+		<property name="codesetDAO" ref="codeSetDAO"></property>
+		<property name="ycPaperDAO" ref="ycPaperDAO"></property>
+	</bean>	
+	
+	
+</beans>

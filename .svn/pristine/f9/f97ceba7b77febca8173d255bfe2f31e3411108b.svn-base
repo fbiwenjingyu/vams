@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<beans>
+	<!-- spring管理struts的的配置文件-->
+	<bean id="pdaAction" class="com.pd.wjpda.action.PADAction" scope="prototype">
+		<property name="wjpdaService"><ref bean="wjpdaService"/></property>
+	</bean>
+	
+	
+</beans>

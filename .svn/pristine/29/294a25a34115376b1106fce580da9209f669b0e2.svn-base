@@ -1,0 +1,890 @@
+package com.pd.arc.service;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import org.apache.commons.lang.xwork.StringUtils;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+import com.pd.arc.dao.impl.ArcBaseInfoDAO;
+import com.pd.arc.dao.impl.ArcBlackCarDAO;
+import com.pd.arc.dao.impl.ArcCallDAO;
+import com.pd.arc.dao.impl.ArcPicInfoDAO;
+import com.pd.arc.dao.impl.ArcRescanInfoDAO;
+import com.pd.arc.dao.impl.ArcStatusRecordDAO;
+import com.pd.arc.model.ArcBaseInfo;
+import com.pd.arc.model.ArcBaseInfoExample;
+import com.pd.arc.model.ArcBaseInfoSuper;
+import com.pd.arc.model.ArcBlackCar;
+import com.pd.arc.model.ArcBlackCarExample;
+import com.pd.arc.model.ArcPicInfo;
+import com.pd.arc.model.ArcPicInfoExample;
+import com.pd.arc.model.ArcRescanInfo;
+import com.pd.arc.model.ArcRescanInfoExample;
+import com.pd.arc.model.ArcStatusRecord;
+import com.pd.arc.model.ArcStatusRecordExample;
+import com.pd.arc.model.ArcPicInfoExample.Criteria;
+import com.pd.cwgl.service.PubStoService;
+import com.pd.cwgl.utils.StoRet;
+import com.pd.right.model.SuperUser;
+import com.pd.system.framework.BaseService;
+import com.pd.system.framework.Pagination;
+import com.pd.system.res.ArcStatus;
+import com.pd.system.res.Constants;
+import com.pd.system.startup.SYSLoadManager;
+import com.pd.webservice.sixandone.QueryVehInfo;
+import com.pd.wjyw.dao.impl.YcInfoDAO;
+import com.pd.wjyw.dao.impl.YcInfoPicDAO;
+import com.pd.wjyw.model.YcInfo;
+import com.pd.wjyw.model.YcInfoExample;
+import com.pd.wjyw.model.YcInfoPic;
+
+public class ArcBaseInfoService extends BaseService{
+	private ArcBaseInfoDAO arcBaseInfoDAO;
+	private ArcPicInfoDAO arcPicInfoDAO;
+	private ArcBlackCarDAO arcBlackCarDAO;
+	private YcInfoDAO ycInfoDAO;
+	private YcInfoPicDAO ycInfoPicDAO;
+	private ArcRescanInfoDAO arcRescanInfoDAO;
+	private ArcCallDAO arcCallDAO;
+	private ArcStatusRecordDAO arcStatusRecordDAO;
+	private PubStoService pubStoService;
+	private JdbcTemplate jdbcTemplate;
+	private JdbcTemplate jdbcTemplate1;
+	private static final String SHWTG = "N";//审核未通过
+	private static final String SHTG = "Y";//审核通过
+	private static final String BUSINESS_ARC = "1";//业务档案
+	private static final String HISTORY_ARC = "2";//历史档案
+	
+	
+	public void setArcBaseInfoDAO(ArcBaseInfoDAO arcBaseInfoDAO) {
+		this.arcBaseInfoDAO = arcBaseInfoDAO;
+	}
+	
+	public void setArcPicInfoDAO(ArcPicInfoDAO arcPicInfoDAO) {
+		this.arcPicInfoDAO = arcPicInfoDAO;
+	}
+
+	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
+	}
+
+	public void setJdbcTemplate1(JdbcTemplate jdbcTemplate1) {
+		this.jdbcTemplate1 = jdbcTemplate1;
+	}
+
+	
+	public Integer countByExample(ArcBaseInfoExample example){
+		return arcBaseInfoDAO.countByExample(example);
+	}
+	
+	public List<ArcBaseInfo> selectByExample(ArcBaseInfoExample example){
+		return arcBaseInfoDAO.selectByExample(example);
+	}
+
+    public void setArcBlackCarDAO(ArcBlackCarDAO arcBlackCarDAO) {
+		this.arcBlackCarDAO = arcBlackCarDAO;
+	}
+    
+	public void setYcInfoDAO(YcInfoDAO ycInfoDAO) {
+		this.ycInfoDAO = ycInfoDAO;
+	}
+
+	public void setYcInfoPicDAO(YcInfoPicDAO ycInfoPicDAO) {
+		this.ycInfoPicDAO = ycInfoPicDAO;
+	}
+    
+	
+	public void setArcRescanInfoDAO(ArcRescanInfoDAO arcRescanInfoDAO) {
+		this.arcRescanInfoDAO = arcRescanInfoDAO;
+	}
+
+	public void setArcCallDAO(ArcCallDAO arcCallDAO) {
+		this.arcCallDAO = arcCallDAO;
+	}
+    
+	
+	public void setPubStoService(PubStoService pubStoService) {
+		this.pubStoService = pubStoService;
+	}
+
+	public void setArcStatusRecordDAO(ArcStatusRecordDAO arcStatusRecordDAO) {
+		this.arcStatusRecordDAO = arcStatusRecordDAO;
+	}
+
+	/**
+	 * 归档审核工作量统计
+	 */
+	
+	public List<ArcBaseInfoSuper> getArcCheckNum(Map map){
+		return arcBaseInfoDAO.getArcCheckNum(map);
+	}
+	
+	/**
+	 * 统计扫描，审核归档入库的档案数量
+	 */
+	
+	public List<ArcBaseInfoSuper> getArcNum(Map map){
+		List listgd = arcBaseInfoDAO.getGdArcNum(map);
+		List listsh = arcBaseInfoDAO.getShArcNum(map);
+		List listrk = arcBaseInfoDAO.getRkArcNum(map);
+		List listsm = arcBaseInfoDAO.getSmArcNum(map);
+		List list = new ArrayList();
+		for(int i= 0 ; i < listgd.size() ; i++){
+			ArcBaseInfoSuper gd = (ArcBaseInfoSuper) listgd.get(i);
+			ArcBaseInfoSuper sh = (ArcBaseInfoSuper) listsh.get(i);
+			ArcBaseInfoSuper rk = (ArcBaseInfoSuper) listrk.get(i);
+			ArcBaseInfoSuper sm = (ArcBaseInfoSuper) listsm.get(i);
+			String mc = gd.getMc();
+			Integer gdNum = gd.getGdNum();
+			Integer shNum = sh.getShNum();
+			Integer rkNum = rk.getRkNum();
+			Integer smNum = sm.getSmNum();
+			ArcBaseInfoSuper entity = new ArcBaseInfoSuper();
+			entity.setGdNum(gdNum);
+			entity.setMc(mc);
+			entity.setShNum(shNum);
+			entity.setSmNum(smNum);
+			entity.setRkNum(rkNum);
+			list.add(entity);
+		}
+		return list;
+	}
+	/**
+     * 根据系统档案编号和档案类型获取档案
+     * @param XTDABH 系统档案编号
+     * @param DALX 档案类型
+     * @return
+     */
+	public List getArcBaseInfoByXTDABHAndDALX(String XTDABH,String DALX){
+		ArcBaseInfoExample example = new ArcBaseInfoExample();
+		example.createCriteria().andXtdabhEqualTo(XTDABH).andDalxEqualTo(DALX);
+		return arcBaseInfoDAO.selectByExample(example);
+	}
+	
+	/**
+     * 根据系统档案编号获取档案
+     * @param XTDABH 系统档案编号
+     * @return
+     */
+	public List getArcBaseInfoByXTDABH(String XTDABH){
+		ArcBaseInfoExample example = new ArcBaseInfoExample();
+		example.createCriteria().andXtdabhEqualTo(XTDABH);
+		return arcBaseInfoDAO.selectByExample(example);
+	}
+    
+	
+	/**
+     * 根据系统档案编号获取重扫表信息
+     * @param XTDABH 系统档案编号
+     * @return
+     */
+	public List getArcRescanInfoByXTDABH(String XTDABH){
+		ArcRescanInfoExample example = new ArcRescanInfoExample();
+		example.createCriteria().andXtdabhEqualTo(XTDABH);
+		return arcRescanInfoDAO.selectByExample(example );
+	}
+	
+	/**
+	 * 根据系统档案编号修改档案
+	 * @param arcBaseInfo
+	 */
+	public void updateArcBaseInfoByXTDABH(ArcBaseInfo arcBaseInfo) {
+		ArcBaseInfoExample example = new ArcBaseInfoExample();
+		example.createCriteria().andXtdabhEqualTo(arcBaseInfo.getXtdabh());
+		arcBaseInfoDAO.updateByExampleSelective(arcBaseInfo, example);	
+	}
+    
+	/**
+	 * 新增图片信息
+	 * @param arcPicInfo
+	 */
+	public void insert(ArcPicInfo arcPicInfo) {
+		arcPicInfoDAO.insert(arcPicInfo);
+		
+	}
+    
+	/**
+	 * 分页查询
+	 * @param index
+	 * @param example
+	 * @return 
+	 * @throws Exception 
+	 */
+	public Pagination findArcBaseInfoPageList(int index, ArcBaseInfoExample example) throws Exception {
+		return super.findPageList(index, example, arcBaseInfoDAO);
+		
+	}
+	
+	
+	public Pagination findArcBaseInfoPageListOfQuerySh(int index, ArcBaseInfoExample example) throws Exception {
+		int totalItems = arcBaseInfoDAO.countByExample(example);
+		//创建分页对象
+		Pagination page = new Pagination(totalItems, Constants.PAGE_ITEM, index);
+		// 设置起条数
+		example.setStart(page.getPageSize() * (page.getIndex() - 1) + 1);
+		// 设置结条数
+		example.setLimit(page.getPageSize() * page.getIndex());
+		page.setPagelist(arcBaseInfoDAO.selectByExampleToPageOfQuerySh(example));
+		return page;	
+	}
+	
+	/**
+	 * 分页查询嫌疑车辆
+	 * @param index
+	 * @param example
+	 * @return
+	 * @throws Exception
+	 */
+	public Pagination findBlackCarPageList(int index,ArcBlackCarExample example)throws Exception {
+		return super.findPageList(index, example,arcBlackCarDAO);
+	}
+    
+	/**
+	 * 通过系统档案编号获取档案图片
+	 * @param xtdabh
+	 * @return
+	 */
+	public List<ArcPicInfo> getPicInfoByXTDABH(String xtdabh) {
+		ArcPicInfoExample example = new ArcPicInfoExample();
+		example.createCriteria().andXtdabhEqualTo(xtdabh);
+		List list = arcPicInfoDAO.selectByExample(example );
+		return list;
+	}
+    
+	/**
+	 * 档案审核不通过
+	 * @param daIds
+	 * @param name
+	 * @param createTime
+	 * @param wjbh
+	 * @param verifyResult
+	 * @param bz
+	 * @return
+	 */
+	public String verifyNotPassOfArcBaseInfo(String xtdabh,String[] daIds, String name,
+			String createTime, String wjbh,String shrmc) {
+		//根据审核结果修改档案信息
+		String sqlArcBaseInfo="update ARC_BASE_INFO set SHSJ=to_date('"+createTime+"','YYYY-MM-DD HH24:MI:SS'),SHR='"+name+"',DAZT='"+ ArcStatus.SHWTG_YW + "'  where XTDABH='"+wjbh+"'";
+		jdbcTemplate.execute(sqlArcBaseInfo);
+		for(int i=0;i<daIds.length;i++){
+			String sqlPicInfo="update ARC_PIC_INFO set SFCS='1' where id='"+daIds[i]+"'";
+			jdbcTemplate.execute(sqlPicInfo);
+		}
+		//TODO
+		//先删后插，应对反复审核不通过的情况
+		String deleteRescan="delete from ARC_RESCAN_INFO where XTDABH='"+xtdabh+"' ";
+		jdbcTemplate.execute(deleteRescan);
+		ArcRescanInfo info = new ArcRescanInfo();
+		info.setId(UUID.randomUUID().toString());
+		info.setXtdabh(xtdabh);
+		info.setArcStatus(ArcStatus.ARC_CSSH);
+		info.setApplyPeople(name);
+		info.setApplyTime(new Date());
+		info.setVerifyPeople(name);
+		info.setVerifyResult("1");
+		info.setVerifyTime(new Date());
+		info.setSfycs("0");
+		info.setSfygd("0");
+		arcRescanInfoDAO.insert(info);
+		
+		ArcStatusRecord record = new ArcStatusRecord();
+		record.setId(UUID.randomUUID().toString());
+		record.setXtdabh(xtdabh);
+		record.setCzr(name);
+		record.setCzrmc(shrmc);
+		record.setCzsj(new Date());
+		record.setStatusCode(ArcStatus.SHWTG_YW);
+		record.setBz("档案审核不通过");
+		arcStatusRecordDAO.insert(record );
+		
+		return "1";
+	}
+    
+	/**
+	 * 外检审核不通过
+	 * @param wjIds
+	 * @param createTime
+	 * @param name
+	 * @param bz
+	 * @param wjbh
+	 * @return
+	 */
+	public String verifyNotPassOfYcInfo(String[] wjIds, String createTime,
+			String name, String bz, String wjbh) {
+		String sqlYcInfo="update yc_info set shsj=to_date('"+createTime+"','YYYY-MM-DD HH24:MI:SS'),shr='"+name+"',shjg='"+SHWTG+"',bz='"+bz+"'  where xtdabh='"+wjbh+"'";
+		jdbcTemplate.execute(sqlYcInfo);
+		for(int i=0;i<wjIds.length;i++){
+			String sqlPicInfo="update yc_info_pic set pic_status='"+SHWTG+"' where id='"+wjIds[i]+"'";
+			jdbcTemplate.execute(sqlPicInfo);
+		}
+		return "1";
+	}
+    
+	/**
+	 * 外检档案都不通过
+	 * @param wjIds
+	 * @param createTime
+	 * @param name
+	 * @param daIds
+	 * @param wjbh
+	 * @param bz
+	 * @return
+	 */
+	public String verifyBothNotPass(String xtdabh,String[] wjIds, String createTime,
+			String name, String[] daIds, String wjbh, String bz,String shrmc) {
+		verifyNotPassOfYcInfo(wjIds,createTime,name,bz,wjbh);
+		verifyNotPassOfArcBaseInfo(xtdabh,daIds,name,createTime,wjbh,shrmc);
+		return "1";
+	}
+    
+	/**
+	 * 外检档案都通过
+	 * @param wjbh
+	 * @param createTime
+	 * @param name
+	 * @param bz
+	 * @return
+	 */
+	public String verifyBothPass(String wjbh, String createTime, String name,
+			String bz,String shrmc) {
+		String sqlYcInfo="update yc_info set shsj=to_date('"+createTime+"','YYYY-MM-DD HH24:MI:SS'),shr='"+name+"',shjg='"+SHTG+"',bz='"+bz+"'  where xtdabh='"+wjbh+"'";
+		jdbcTemplate.execute(sqlYcInfo);
+		String sqlPicInfo="update yc_info_pic set pic_status='"+SHTG+"' where xtdabh='"+wjbh+"'";
+		jdbcTemplate.execute(sqlPicInfo);
+        
+		String sqlArcBaseInfo="update ARC_BASE_INFO set SHSJ=to_date('"+createTime+"','YYYY-MM-DD HH24:MI:SS'),SHR='"+name+"',DAZT='"+ ArcStatus.SHTG_YW + "'  where XTDABH='"+wjbh+"'";
+		jdbcTemplate.execute(sqlArcBaseInfo);
+		String sqlArcPicInfo="update ARC_PIC_INFO set SFCS='0' where xtdabh='"+wjbh+"'";
+		jdbcTemplate.execute(sqlArcPicInfo);
+	    
+		//删除流水
+		List<ArcBaseInfo> list = getArcBaseInfoByXTDABH(wjbh);
+		if(list != null && list.size() > 0){
+			ArcBaseInfo arcBaseInfo = list.get(0);
+			String delSf = "delete from LYZB_VEH_DALSH where lsh = '"+arcBaseInfo.getLsh()+"'";
+			jdbcTemplate1.execute(delSf);
+		}
+			
+
+		ArcStatusRecord record = new ArcStatusRecord();
+		record.setId(UUID.randomUUID().toString());
+		record.setXtdabh(wjbh);
+		record.setCzr(name);
+		record.setCzrmc(shrmc);
+		record.setCzsj(new Date());
+		record.setStatusCode(ArcStatus.SHTG_YW);
+		record.setBz("档案审核通过");
+		arcStatusRecordDAO.insert(record );
+		return "1";
+	}
+    
+	/**
+	 * 重扫审核
+	 * @param xtdabh
+	 * @param picIds
+	 * @param saveStatus
+	 * @param arcCssh
+	 */
+	public void rescanVerify(String xtdabh, String[] picIds, String saveStatus,
+			String arcCssh,SuperUser user) {
+		String sqlArcBaseInfo="update ARC_BASE_INFO set DAZT='"+ ArcStatus.ARC_CSSH + "' where XTDABH='"+xtdabh+"'";
+		jdbcTemplate.execute(sqlArcBaseInfo);
+		for(int i=0;i<picIds.length;i++){
+			String sqlPicInfo="update ARC_PIC_INFO set SFCS='" + saveStatus + "' where id='"+picIds[i]+"'";
+			jdbcTemplate.execute(sqlPicInfo);
+		}
+		
+		ArcRescanInfoExample example = new ArcRescanInfoExample();
+		example.createCriteria().andXtdabhEqualTo(xtdabh);
+		if("0".equals(saveStatus)){//审核不通过
+			arcRescanInfoDAO.deleteByExample(example );
+		}
+		if("1".equals(saveStatus)){//审核通过
+			List<ArcRescanInfo> list = arcRescanInfoDAO.selectByExample(example);
+			//String deleteRescan="delete from ARC_RESCAN_INFO where XTDABH='"+xtdabh+"' ";
+			//jdbcTemplate.execute(deleteRescan);
+			if(list != null && list.size() > 0){
+				ArcRescanInfo arcRescanInfo = list.get(0);
+				arcRescanInfo.setVerifyPeople(user.getUserCode());
+				arcRescanInfo.setVerifyTime(new Date());
+				arcRescanInfo.setVerifyResult("1");
+				arcRescanInfo.setArcStatus( ArcStatus.ARC_CSSH);
+				arcRescanInfoDAO.updateByPrimaryKeySelective(arcRescanInfo);
+			}
+		}
+		
+		ArcStatusRecord record = new ArcStatusRecord();
+		record.setId(UUID.randomUUID().toString());
+		record.setXtdabh(xtdabh);
+		record.setCzr(user.getUserCode());
+		record.setCzrmc(user.getUserName());
+		record.setCzsj(new Date());
+		record.setStatusCode(ArcStatus.ARC_CSSH);
+		record.setBz("档案重扫审核");
+		arcStatusRecordDAO.insert(record );
+		
+		
+	}
+	
+
+    /**
+     * 判断是否为嫌疑车牌
+     * @param xtdabh
+     * @return true表示为是嫌疑车牌，false不是嫌疑车牌
+     */
+	public boolean isBlackCar(String clsbdh){
+		ArcBlackCarExample example = new ArcBlackCarExample();
+		example.createCriteria().andClsbdhEqualTo(clsbdh);
+		List list = arcBlackCarDAO.selectByExample(example);
+		if(list != null && list.size() > 0){
+			return true;
+		}
+		return false;
+	}
+    
+	/**
+	 * 条码拆解
+	 * @param wjbh
+	 * @param lsh
+	 * @return
+	 */
+	public String cjtm(String wjbh, String lsh) {
+		String msg;
+		List<ArcBaseInfo> list= getArcBaseInfoBylshAndXtdabh(lsh, wjbh); //归档表是否存在 lsh wjbh
+		if(list==null || list.size()<=0){
+			msg = "拆解失败，该系统编号和流水号没有合并，无需拆解";
+		}else{
+			ArcBaseInfo arcBaseInfo = list.get(0);
+			String arcType = arcBaseInfo.getDalx();
+			if(StringUtils.isEmpty(arcType) || BUSINESS_ARC.equals(arcType)){
+				String cwbh = arcBaseInfo.getCwbh();
+				if(StringUtils.isNotEmpty(cwbh)){
+					msg = "拆解失败,档案已归档，不能拆解";
+					return msg;
+				}
+				
+				YcInfoExample example = new YcInfoExample();
+				example.createCriteria().andXtdabhEqualTo(wjbh);
+				List<YcInfo> ycInfoList =ycInfoDAO.selectByExample(example );
+				if(ycInfoList==null || ycInfoList.size()<=0){
+					msg = "拆解失败，该系统编号和流水号没有合并，无需拆解";
+					return msg;
+				}
+						
+				arcBaseInfo.setLsh("");//流水号
+				arcBaseInfo.setXh("");//序号
+				arcBaseInfo.setHpzl("");//号牌种类
+				arcBaseInfo.setHphm("");//号牌号码
+				arcBaseInfo.setClpp1("");//品牌1
+				arcBaseInfo.setClxh("");//车辆型号
+				arcBaseInfo.setClpp2("");//品牌2
+				arcBaseInfo.setZzg("");//制造国
+				arcBaseInfo.setZzcmc("");//制造厂名称
+				arcBaseInfo.setClsbdh("");//车辆识别代号
+				arcBaseInfo.setFdjh("");//发动机号
+				arcBaseInfo.setCllx("");//车辆型号
+				arcBaseInfo.setCsys("");//车身颜色
+				arcBaseInfo.setSfzmhm("");//身份证明号码
+				arcBaseInfo.setSyr("");//所有人
+				arcBaseInfo.setFzjg("");//发证机关
+				arcBaseInfo.setDabh("");//档案编号
+				arcBaseInfo.setYwlx("");//业务类型
+				arcBaseInfo.setDazt(ArcStatus.YSM);//档案状态
+				arcBaseInfo.setSfbh("0");//是否合并
+				updateBaseInfo(arcBaseInfo);//修改档案基本信息表
+				String updateArcPic="update ARC_PIC_INFO set SFCS='0' where XTDABH='"+wjbh+"' "; //修改档案扫描图片为默认初始状态
+				jdbcTemplate.execute(updateArcPic); 
+				
+				String updateYcInfo="update YC_INFO set LSH='',HPHM='',SHJG='S',STATUS='C' where XTDABH='"+wjbh+"' "; //修改外检表
+				jdbcTemplate.execute(updateYcInfo);
+				
+				String updateYcPic="update YC_INFO_PIC set PIC_STATUS='S' where XTDABH='"+wjbh+"' ";//修改外检图片表
+				jdbcTemplate.execute(updateYcPic);
+				
+			    //删除流水
+				
+				String delSf = "delete from LYZB_VEH_DALSH where lsh = '"+lsh+"'";
+				jdbcTemplate1.execute(delSf);	
+				
+				
+				msg = "拆解成功";
+			}else if(HISTORY_ARC.equals(arcType)){
+				msg = "拆解失败,历史档案不能拆解";
+			}else{
+				msg = "数据异常";
+			}
+			
+		}
+		return msg;
+	}
+
+	public boolean  updateBaseInfo(ArcBaseInfo arcBaseInfo) {
+		return arcBaseInfoDAO.updateByPrimaryKeySelective(arcBaseInfo)==1?true:false;
+		
+	}
+	
+	public boolean  updateBaseInfoGd(ArcBaseInfo arcBaseInfo,SuperUser user) {
+		//TODO
+		ArcStatusRecord record = new ArcStatusRecord();
+		record.setId(UUID.randomUUID().toString());
+		record.setXtdabh(arcBaseInfo.getXtdabh());
+		record.setCzr(user.getUserCode());
+		record.setCzrmc(user.getUserName());
+		record.setCzsj(new Date());
+		record.setStatusCode(ArcStatus.YGD);
+		record.setBz("档案归档");
+		arcStatusRecordDAO.insert(record );
+		return arcBaseInfoDAO.updateByPrimaryKeySelective(arcBaseInfo)==1?true:false;
+		
+	}
+
+	private List<ArcBaseInfo> getArcBaseInfoBylshAndXtdabh(String lsh,
+			String wjbh) {
+		ArcBaseInfoExample example = new ArcBaseInfoExample();
+		example.createCriteria().andLshEqualTo(lsh).andXtdabhEqualTo(wjbh);
+		List list = arcBaseInfoDAO.selectByExample(example );
+		return list;
+	}
+
+	/**
+	 * 补全档案表
+	 * 		号牌种类，号牌号码信息
+	 * @param arcBaseBean
+	 * @return
+	 * 
+	 * @author ywj
+	 * 2014-8-12
+	 */
+	public boolean completeArcBaseInfo(ArcBaseInfo arcBaseBean){
+		//查询六合一补全档案表的号牌号码，号牌种类信息
+		if(arcBaseBean != null ){
+			/*if(arcBaseBean.getHphm()!= null && arcBaseBean.getHpzl()!=null){
+				return true;
+			}*/
+			Map<String, String> map6in1;
+			try {
+				if(HISTORY_ARC.equals(arcBaseBean.getDalx())){//历史档案不查六合一
+					return true;
+				}
+				map6in1 = QueryVehInfo._01C26(arcBaseBean.getLsh()).getSingleMap();
+				if("on".equals(SYSLoadManager.sys_attr_map.get("test.sixone.switch"))){
+					map6in1 = new HashMap<String, String>();
+					map6in1.put("hphm", "test");
+					map6in1.put("hpzl", "01");
+				}
+				if(map6in1 != null){
+					arcBaseBean.setHphm(map6in1.get("hphm"));
+					arcBaseBean.setHpzl(map6in1.get("hpzl"));
+					arcBaseInfoDAO.updateByPrimaryKeySelective(arcBaseBean);
+					return true;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				return false;
+			}
+		}
+		return false;
+	}
+    
+	/**
+	 * 根据主键获取档案
+	 * @param arcId
+	 * @return
+	 */
+	public ArcBaseInfo selectBaseByPrimaryKey(String arcId) {
+		return arcBaseInfoDAO.selectByPrimaryKey(arcId);
+	}
+	
+	/**
+	 * 档案归档
+	 * @param baseInfo 归档表信息
+	 * @param storeNumber 储位编号
+	 * @param user 用户账号
+	 * @throws Exception 
+	 */
+	public boolean baseInfoGd(ArcBaseInfo baseInfo,String storeNumber, SuperUser user) throws Exception {
+		try{
+			updateBaseInfo(baseInfo);
+			//String saveResult = stoPubService.saveCwbh(storeNumber, baseInfo.getArcSid(), baseInfo.getLsh(), baseInfo.getDabh(), baseInfo.getYwlx(), baseInfo.getDeptArea(), baseInfo.getSfzmmc(), baseInfo.getSfzmhm(), baseInfo.getXm(), baseInfo.getXb(), null, "", "", baseInfo.getZjcx(), baseInfo.getFzjg(), baseInfo.getArcType(), "", user);
+			String result = pubStoService.addCwbh(baseInfo.getXtdabh(), storeNumber, user);
+
+			ArcStatusRecord record = new ArcStatusRecord();
+			record.setId(UUID.randomUUID().toString());
+			record.setXtdabh(baseInfo.getXtdabh());
+			record.setCzr(user.getUserCode());
+			record.setCzrmc(user.getUserName());
+			record.setCzsj(new Date());
+			record.setStatusCode(ArcStatus.YGD);
+			record.setBz("档案归档");
+			arcStatusRecordDAO.insert(record );
+			
+			if(StoRet.SUCCESS.equals(result)){
+				return true;
+			}else{
+				throw new Exception("错误代码：" + result);
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return false;
+		
+	}
+
+	public List<ArcPicInfo> getPicInfoByXTDABHAndStatus(String xtdabh,
+			String picPage) {
+		ArcPicInfoExample example = new ArcPicInfoExample();
+		Criteria ca = example.createCriteria();
+		ca.andXtdabhEqualTo(xtdabh);
+		if("sh".equals(picPage)){
+			//重扫审核，图片保存状态 3 为 修改申请
+			ca.andTplxEqualTo("3");
+		}
+		//if("cx".equals(picPage)){
+		//	ca.andSfcsEqualTo("1");
+		//}
+		
+		List list = arcPicInfoDAO.selectByExample(example );
+		return list;
+	}
+    
+	/**
+	 * 重扫申请
+	 * @param pid
+	 * @param xtdabh
+	 * @param sm
+	 * @param user
+	 */
+	public void verifyRescanApply(String[] pid, String xtdabh, String sm,
+			SuperUser user) {
+		String sqlArcBaseInfo="update ARC_BASE_INFO set DAZT='"+ ArcStatus.ARC_CSSQ + "',bz='" +sm + "'  where XTDABH='"+xtdabh+"'";
+		jdbcTemplate.execute(sqlArcBaseInfo);
+		for(int i=0;i<pid.length;i++){
+			String sqlPicInfo="update ARC_PIC_INFO set TPLX='3' where id='"+pid[i]+"'";
+			jdbcTemplate.execute(sqlPicInfo);
+		}
+		//先删后插，应对反复申请的情况
+		String deleteRescan="delete from ARC_RESCAN_INFO where XTDABH='"+xtdabh+"' ";
+		jdbcTemplate.execute(deleteRescan);
+		ArcRescanInfo info = new ArcRescanInfo();
+		info.setId(UUID.randomUUID().toString());
+		info.setXtdabh(xtdabh);
+		info.setArcStatus(ArcStatus.ARC_CSSQ);
+		info.setApplyPeople(user.getUserCode());
+		info.setApplyTime(new Date());
+		info.setApplyReason(sm);
+		info.setSfycs("0");
+		info.setSfygd("1");
+		arcRescanInfoDAO.insert(info);
+		//TODO
+		ArcStatusRecord record = new ArcStatusRecord();
+		record.setId(UUID.randomUUID().toString());
+		record.setXtdabh(xtdabh);
+		record.setCzr(user.getUserCode());
+		record.setCzrmc(user.getUserName());
+		record.setCzsj(new Date());
+		record.setStatusCode(ArcStatus.ARC_CSSQ);
+		record.setBz("档案重扫申请");
+		arcStatusRecordDAO.insert(record );
+		
+		
+	}
+    
+	/**
+	 * 档案审核
+	 * @param createTime
+	 * @param name
+	 * @param dazt
+	 * @param xtdabh
+	 * @param sfcs
+	 * @param pid
+	 */
+	public void baseInfoVerify(String createTime, String name,String shrmc, String dazt,
+			String xtdabh, String sfcs, String[] pid) {
+		String sqlArcBaseInfo="update ARC_BASE_INFO set SHSJ=to_date('"+createTime+"','YYYY-MM-DD HH24:MI:SS'),SHR='"+name+"',DAZT='"+ dazt + "',SHRMC='" + shrmc + "' where XTDABH='"+xtdabh+"'";
+		jdbcTemplate.execute(sqlArcBaseInfo);
+		for(int i=0;i<pid.length;i++){
+			String sqlPicInfo="update ARC_PIC_INFO set SFCS='"+sfcs+"' where id='"+pid[i]+"'";
+			jdbcTemplate.execute(sqlPicInfo);
+		}
+		if("1".equals(sfcs)){//审核未通过，需重扫
+			//先删后插，应对反复审核不通过的情况
+			String deleteRescan="delete from ARC_RESCAN_INFO where XTDABH='"+xtdabh+"' ";
+			jdbcTemplate.execute(deleteRescan);
+			ArcRescanInfo info = new ArcRescanInfo();
+			info.setId(UUID.randomUUID().toString());
+			info.setXtdabh(xtdabh);
+			info.setArcStatus(ArcStatus.ARC_CSSH);
+			info.setApplyPeople(name);
+			info.setApplyTime(new Date());
+			info.setVerifyPeople(name);
+			info.setVerifyResult("1");
+			info.setVerifyTime(new Date());
+			info.setSfycs("0");
+			info.setSfygd("0");
+			arcRescanInfoDAO.insert(info);
+		}//删除流水
+		else if("0".equals(sfcs)){//审核通过
+			List<ArcBaseInfo> list = getArcBaseInfoByXTDABH(xtdabh);
+			if(list != null && list.size() > 0){
+				ArcBaseInfo arcBaseInfo = list.get(0);
+				String delSf = "delete from LYZB_VEH_DALSH where lsh = '"+arcBaseInfo.getLsh()+"'";
+				jdbcTemplate1.execute(delSf);
+			}
+				
+		}
+		
+		insertArcStatusRecord(xtdabh,name,shrmc,new Date(),dazt,"档案审核");
+		
+	}
+
+	private void insertArcStatusRecord(String xtdabh, String name,
+			String shrmc, Date date, String dazt, String bz) {
+		ArcStatusRecord record = new ArcStatusRecord();
+		record.setId(UUID.randomUUID().toString());
+		record.setXtdabh(xtdabh);
+		record.setCzr(name);
+		record.setCzrmc(shrmc);
+		record.setCzsj(date);
+		record.setStatusCode(dazt);
+		record.setBz(bz);
+		arcStatusRecordDAO.insert(record );
+		
+	}
+
+	public void noPicVeirfy(String wsh, String wjbh) {
+		String ycInfoUpdate = "update yc_info set ywlx='',hphm='',hpzl='',cjr='',cjrmc='',xzqh='',bz='',lsh='',shr='',shsj='',shjg='" + wsh + "' where xtdabh='"+wjbh+"' ";
+		jdbcTemplate.execute(ycInfoUpdate);
+		//拆解档案信息
+		String arcBaseInfoUpdate = "update arc_base_info set lsh='',xh='',hpzl='',hphm='' where  xtdabh='"+wjbh+"' ";
+		jdbcTemplate.execute(arcBaseInfoUpdate);
+		
+	}
+    
+	/**
+	 * 档案退办
+	 * @param pics
+	 * @param xtdabh
+	 */
+	public void arcBaseBackOffice(List<ArcPicInfo> pics, String xtdabh) {
+		for(ArcPicInfo pic : pics){
+			//1.删除本地图片
+			File file = new File(pic.getTplj());
+			file.delete();
+		}
+		
+		//2.删除档案图片表数据
+		String sqlDel = "delete from ARC_PIC_INFO where xtdabh='"+xtdabh+"'";
+		jdbcTemplate.execute(sqlDel);
+        
+		//3.删除档案主表数据
+		String sqlDelArcBase = "delete from ARC_BASE_INFO where xtdabh='"+xtdabh+"'";
+		jdbcTemplate.execute(sqlDelArcBase);
+		
+		//删除流水
+		List<ArcBaseInfo> list = getArcBaseInfoByXTDABH(xtdabh);
+		if(list != null && list.size() > 0){
+			ArcBaseInfo arcBaseInfo = list.get(0);
+			String delSf = "delete from LYZB_VEH_DALSH where lsh = '"+arcBaseInfo.getLsh()+"'";
+			jdbcTemplate1.execute(delSf);
+		}
+			
+		
+	}
+    
+	/**
+	 * 综合退办
+	 * @param pics
+	 * @param xtdabh
+	 * @param picsArc
+	 */
+	public void backOfficeZh(List<YcInfoPic> pics, String xtdabh,
+			List<ArcPicInfo> picsArc) {
+		for(YcInfoPic pic : pics){
+			//1.1.删除本地图片
+			String path = pic.getPicpath();
+			File file = new File(path);
+			file.delete();
+		}
+		//1.2.删除外检图片表数据
+		String sqlDelPic = "delete from YC_INFO_PIC where xtdabh='"+xtdabh+"'";
+		jdbcTemplate.execute(sqlDelPic);
+        
+		//1.3.修改外检主表数据
+		String sqlDelYcInfo = "delete from yc_info where xtdabh='"+xtdabh+"' ";
+		jdbcTemplate.execute(sqlDelYcInfo);
+		
+		for(ArcPicInfo pic : picsArc){
+			//1.删除本地图片
+			File file = new File(pic.getTplj());
+			file.delete();
+		}
+		
+		//2.删除档案图片表数据
+		String sqlDel = "delete from ARC_PIC_INFO where xtdabh='"+xtdabh+"'";
+		jdbcTemplate.execute(sqlDel);
+        
+		//3.删除档案主表数据
+		String sqlDelArcBase = "delete from ARC_BASE_INFO where xtdabh='"+xtdabh+"'";
+		jdbcTemplate.execute(sqlDelArcBase);	
+		//删除流水
+	
+		List<ArcBaseInfo> list = getArcBaseInfoByXTDABH(xtdabh);
+		if(list != null && list.size() > 0){
+			ArcBaseInfo arcBaseInfo = list.get(0);
+			String delSf = "delete from LYZB_VEH_DALSH where lsh = '"+arcBaseInfo.getLsh()+"'";
+			jdbcTemplate1.execute(delSf);
+		}
+			
+		
+	}
+    
+	public void insert(ArcBaseInfo arcBaseInfo) {
+		arcBaseInfoDAO.insert(arcBaseInfo);
+		
+	}
+    
+	/**
+	 * 嫌疑车辆解锁
+	 * @param xtdabh 系统档案编号
+	 */
+	public void unlock(String xtdabh) {
+		String sqlDel = "delete from ARC_BLACK_CAR where xtdabh='"+xtdabh+"'";
+		jdbcTemplate.execute(sqlDel);
+		
+	}
+    
+	/**
+	 * 设置为嫌疑车辆
+	 * @param baseInfo
+	 */
+	public void setToSuspicion(ArcBaseInfo baseInfo) {
+		ArcBlackCar record = new ArcBlackCar();
+		record.setHphm(baseInfo.getHphm());
+		record.setClsbdh(baseInfo.getClsbdh());
+		record.setXtdabh(baseInfo.getXtdabh());
+		record.setYwlx(baseInfo.getYwlx());
+		arcBlackCarDAO.insert(record );
+		
+	}
+    
+	public void insertArcStatusRecord(ArcStatusRecord arcStatusRecord){
+		arcStatusRecordDAO.insert(arcStatusRecord);
+	}
+
+	public List<ArcStatusRecord> flowQuery(String xtdabh) {
+		ArcStatusRecordExample example = new ArcStatusRecordExample();
+		com.pd.arc.model.ArcStatusRecordExample.Criteria crt = example.createCriteria();
+		crt.andXtdabhEqualTo(xtdabh);
+		example.setOrderByClause("CZSJ");
+		return arcStatusRecordDAO.selectByExample(example);
+	}
+	
+
+
+}

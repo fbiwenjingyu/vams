@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN"
+    "http://struts.apache.org/dtds/struts-2.1.7.dtd">
+
+<struts>
+    <package name="arc" namespace="/" extends="vams-default">
+		<action name="arcBaseInfo" class="arcBaseInfoAction">
+			<result name="gdsh_list_post">/arc/gdsh_list_post.jsp</result>
+			<result name="gdsh_list_pri">/arc/gdsh_list_pri.jsp</result>
+			<result name="wjcy_showPic">/arc/wjcy_showPic.jsp</result>
+			<result name="wjcy_hcd">/arc/wjcy_hcd.jsp</result> 
+			<result name="ywsh_sh">/arc/ywsh_sh.jsp</result>
+			<result name="zhsh_sh">/arc/zhsh_sh.jsp</result>
+			<result name="wjcy_hcdZh">/arc/wjcy_hcdZh.jsp</result>
+			<result name="cssq_list">/arc/cssq_list.jsp</result>
+			<result name="cssq_sq">/arc/cssq_sq.jsp</result>
+			<result name="cssh_sh">/arc/cssh_sh.jsp</result>
+			<result name="printCode_list">/arc/printCode_list.jsp</result>
+			<result name="tmcj">/arc/wjcy_cjtm.jsp</result>
+			<result name="dagd_list">/arc/dagd_list.jsp</result>
+			<result name="dagd_gd">/arc/dagd_gd.jsp</result>
+			<result name="cscx_list">/arc/cscx_list.jsp</result>
+			<result name="wjcy_hbtm">/wjyw/ycInfo_barCode.jsp</result>
+			<result name="ycInfo_showBigPic">/arc/ycInfo_showBigPic.jsp</result>
+			<result name="arcBase_showBigPic">/arc/arcBase_showBigPic.jsp</result>
+			<result name="showArcPic">/arc/show_arc_pic.jsp</result>
+			<result name="showAllPic">/arc/show_all_pic.jsp</result>
+			<result name="blackcar_list">/arc/blackcar_list.jsp</result>
+			<result name="error">/arc/error.jsp</result>
+			<result name="flowQuery">/arc/flow_list.jsp</result>
+		</action>
+		
+		<!-- 查询 -->
+		<action name="arcQuery-*" method="{1}" class="arcQueryAction">
+			<result name="list">/arc/query/arc_base_info_query.jsp</result>
+			<result name="cqVin">/arc/query/arc_base_info_query_comb_vin.jsp</result>
+		</action>
+		
+	</package>
+	
+</struts>
+

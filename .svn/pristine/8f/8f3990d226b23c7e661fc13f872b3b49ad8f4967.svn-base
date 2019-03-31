@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<beans>
+	<!-- spring管理struts的的配置文件-->
+	
+	<bean id="storageInAction" class="com.pd.swgl.action.StorageInAction" scope="prototype">
+		<property name="storageInService" ref="storageInService"/>
+	</bean>
+	<bean id="storageOutAction" class="com.pd.swgl.action.StorageOutAction" scope="prototype">
+		<property name="storageOutService" ref="storageOutService"/>
+	</bean>
+	<bean id="storageCombAction" class="com.pd.swgl.action.StorageCombAction" scope="prototype">
+		<property name="storageCombService" ref="storageCombService"/>
+	</bean>
+	
+</beans>

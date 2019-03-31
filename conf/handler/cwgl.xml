@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN"
+    "http://struts.apache.org/dtds/struts-2.1.7.dtd">
+
+<struts>
+    <package name="cwgl" namespace="/cwgl" extends="vams-default">
+    	<action name="stoset-*" class="stoSettingAction" method="{1}">
+    		<result name="list">/cwgl/cwsz/sto_setting_list.jsp</result>
+    		<result name="toAddShi">/cwgl/cwsz/add_shi.jsp</result>
+    		<result name="toAddGui">/cwgl/cwsz/add_gui.jsp</result>
+    		<result name="toModifySet">/cwgl/cwsz/sto_setting_modify.jsp</result>
+    	</action>
+    	<action name="stoget-*" class="stoGettingAction" method="{1}">
+    		<result name="table">/cwgl/cwhq/sto_table.jsp</result>
+    		<result name="gotoGe">/cwgl/cwhq/sto_ge_list.jsp</result>
+    		<result name="detailInfo">/cwgl/cwhq/sto_detail_msg.jsp</result>
+    		<result name="stoAssign">/cwgl/cwhq/sto_assign.jsp</result>
+    		<result name="toModifyInfo">/cwgl/cwhq/sto_info_modify.jsp</result>
+    		<result name="moveStore">/cwgl/cwhq/sto_move_table.jsp</result><!-- 储位迁移 -->
+     		<result name="getStore">/cwgl/cwhq/sto_get_store.jsp</result><!-- 储位获取 -->
+     		<result name="intoInsertCwbh">/cwgl/cwhq/sto_insert_cwbh.jsp</result><!-- 插入储位编号界面 -->
+     		<result name="moveTable">/cwgl/cwhq/sto_arc_move.jsp</result><!-- 档案迁移 -->
+    	</action>
+    	<action name="stoquery-*" class="stoQueryAction" method="{1}">
+    		<result name="list">/cwgl/kfcx/sto_info_query.jsp</result>
+    	</action>
+	</package>
+</struts>
+

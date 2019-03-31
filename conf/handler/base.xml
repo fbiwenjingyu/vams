@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN"
+    "http://struts.apache.org/dtds/struts-2.1.7.dtd">
+
+<struts>
+    <package name="base" namespace="/" extends="vams-default">
+		<action name="attr" class="attrAction">
+			<result name="attr_list">/base/attr_list.jsp</result>
+		</action>
+		<action name="codeSet" class="codeSetAction">
+			<result name="codeSet_list">/base/codeSet_list.jsp</result>
+		</action>
+		<action name="flow" class="flowAction">
+			<result name="flow_list">/base/flow_list.jsp</result>
+		</action>
+		<action name="paper" class="paperAction">
+			<result name="paper_list">/base/paper_list.jsp</result>
+		</action>
+		<action name="seclevel" class="seclevelAction">
+			<result name="seclevel_list">/base/seclevel_list.jsp</result>
+			<result name="input">/error.jsp</result>
+		</action>
+		<action name="typeset" class="typesetAction">
+			<result name="typeset_list">/base/typeset_list.jsp</result>
+		</action>
+		
+	</package>
+	
+	
+</struts>
+

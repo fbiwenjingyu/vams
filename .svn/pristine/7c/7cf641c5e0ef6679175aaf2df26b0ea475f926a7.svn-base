@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMapConfig      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+	<settings cacheModelsEnabled="true" enhancementEnabled="true" lazyLoadingEnabled="true" maxRequests="128" 
+	          maxSessions="64" maxTransactions="16" useStatementNamespaces="true" />
+	<!-- List the SQL Map XML files. They can be loaded from the classpath, as they are here (com.marketing.data...) -->
+	<!--start加载权限的sqlmap文件-->
+	<sqlMap resource="com/pd/right/model/sqlmap/ROLE_SqlMap.xml" /> 
+	<sqlMap resource="com/pd/right/model/sqlmap/DEPT_SqlMap.xml" /> 
+	<sqlMap resource="com/pd/right/model/sqlmap/LOG_SqlMap.xml" /> 
+	<sqlMap resource="com/pd/right/model/sqlmap/RESOURCES_SqlMap.xml" /> 
+	<sqlMap resource="com/pd/right/model/sqlmap/ROLE_RES_SqlMap.xml" /> 
+	<sqlMap resource="com/pd/right/model/sqlmap/USERS_SqlMap.xml" />  
+	<!--end 权限-->
+	
+	<!--start加载基础数据的sqlmap文件-->
+	<sqlMap resource="com/pd/base/model/sqlmap/ATTR_SqlMap.xml" /> 
+	<sqlMap resource="com/pd/base/model/sqlmap/FLOW_SqlMap.xml" /> 
+	<sqlMap resource="com/pd/base/model/sqlmap/PAPER_SqlMap.xml" /> 
+	<sqlMap resource="com/pd/base/model/sqlmap/SECLEVEL_SqlMap.xml" /> 
+	<sqlMap resource="com/pd/base/model/sqlmap/TYPESET_SqlMap.xml" />  
+	<sqlMap resource="com/pd/base/model/sqlmap/CODESET_SqlMap.xml" />
+	<!--end 基础数据-->
+	
+	<!--start加载外检业务数据的sqlmap文件-->
+	<sqlMap resource="com/pd/wjyw/model/sqlmap/YC_INFO_PIC_SqlMap.xml" /> 
+	<sqlMap resource="com/pd/wjyw/model/sqlmap/YC_INFO_SqlMap.xml" /> 
+	<sqlMap resource="com/pd/wjyw/model/sqlmap/YC_PAPER_SqlMap.xml" /> 
+	<sqlMap resource="com/pd/wjyw/model/sqlmap/YC_TYPE_PAPER_SqlMap.xml" /> 
+	<!--end 加载外检业务数据-->
+	
+	<!--start加载档案业务数据的sqlmap文件-->
+	<sqlMap resource="com/pd/arc/model/sqlmap/ARC_BASE_INFO_SqlMap.xml" /> 
+	<sqlMap resource="com/pd/arc/model/sqlmap/ARC_PIC_INFO_SqlMap.xml" /> 
+	<sqlMap resource="com/pd/arc/model/sqlmap/ARC_BLACK_CAR_SqlMap.xml" /> 
+	<sqlMap resource="com/pd/arc/model/sqlmap/ARC_RESCAN_INFO_SqlMap.xml" /> 
+	<sqlMap resource="com/pd/arc/model/sqlmap/ARC_COMB_INFO_SqlMap.xml" /> 
+	<sqlMap resource="com/pd/arc/model/sqlmap/ARC_CALL_SqlMap.xml" /> 
+	<sqlMap resource="com/pd/arc/model/sqlmap/ARC_STATUS_RECORD_SqlMap.xml" /> 
+	<!--end 加载档案业务数据-->
+	
+	<!--start加载外检PDA业务数据的sqlmap文件-->
+	<sqlMap resource="com/pd/wjpda/model/sqlmap/Wjpda_SqlMap.xml" /> 
+	<!--end 基础数据-->
+	
+	<!-- start实物管理 -->
+	<sqlMap resource="com/pd/swgl/model/sqlmap/ARC_STORAGE_IN_SqlMap.xml" /> 
+	<sqlMap resource="com/pd/swgl/model/sqlmap/ARC_STORAGE_OUT_SqlMap.xml" /> 
+	<sqlMap resource="com/pd/swgl/model/sqlmap/ARC_STORAGE_COMB_SqlMap.xml" /> 
+	<!-- end实物管理 -->
+	<!-- 储位管理 -->
+	<sqlMap resource="com/pd/cwgl/model/sqlmap/STO_SETTING_SqlMap.xml" /> 
+</sqlMapConfig> 

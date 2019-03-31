@@ -1,0 +1,76 @@
+package com.pd.webservice.scan;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * 扫描中间层解析时逻辑常量
+ * @author zhangyi
+ * @modified by ywj
+ */
+public class ScanConstant {
+    //字符串格式的日期
+	public static String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    
+    public static Map<String, String> commandMap = new HashMap<String, String>() {
+        private static final long serialVersionUID = 1L;
+        {
+        	//用户登录
+        	put("login", "com.pd.webservice.scan.commands.LoginCommand");
+        	//获取档案页
+        	put("getArcPage", "com.pd.webservice.scan.commands.GetArcPageCommand");
+        	//业务档案查询
+        	put("queryBusinessArc", "com.pd.webservice.scan.commands.QueryBusinessArcCommand");
+        	//历史档案查询
+        	put("queryHistoryArc", "com.pd.webservice.scan.commands.QueryHistoryArcCommand");
+        	//图片信息上传
+        	put("uploadPic", "com.pd.webservice.scan.commands.UploadPicCommand");
+        	//查询重扫的档案页列表
+        	put("queryReScanPageList", "com.pd.webservice.scan.commands.QueryReScanPageListCommand");
+        	//任务统计
+        	put("countTask", "com.pd.webservice.scan.commands.CountTaskCommand");
+        	//抽扫查询
+        	put("queryPickScanPageList", "com.pd.webservice.scan.commands.QueryPickScanPageListCommand");
+
+        	/*
+        	 * 扫描客户端V2.0接口
+        	 */
+        	put("queryBusinessArcV2", "com.pd.webservice.scan.commands.QueryBusinessArcCommandV2");
+        	put("queryHistoryArcV2", "com.pd.webservice.scan.commands.QueryHistoryArcCommandV2");
+        	put("uploadPicV2", "com.pd.webservice.scan.commands.UploadPicCommandV2");
+        	put("queryReScanPageListV2", "com.pd.webservice.scan.commands.QueryReScanPageListCommandV2");
+        	put("queryScaned", "com.pd.webservice.scan.commands.QueryScanedCommand");
+        	
+        	put("getDiskInfo", "com.pd.webservice.scan.commands.GetDiskInfoCommand");
+        	put("getYwlx", "com.pd.webservice.scan.commands.GetYwlxCommand");
+        	
+        }
+    };
+    
+    //返回消息Map对象
+    public static Map<String, String> messageMap = new HashMap<String, String>() {
+        private static final long serialVersionUID = 2L;
+        {
+        	put("1", "成功");
+        	put("0", "失败");
+        	put("0000", "报文解析错误或其它错误");
+        	put("0001", "必要参数不能为空");
+        	put("0002", "数据库操作失败");
+        	put("0003", "查询六合一系统数据失败");
+        	put("0009", "接口序列号错误");
+        	put("0100", "用户名或密码错误");
+        	put("0400", "当前岗位在办的业务类型没有可扫的档案页，请联系管理员是否正常");
+        	put("0500", "流水号重复，不能进行重复扫描");
+        	put("0501", "号牌号码+号牌种类+业务类型重复，不能进行初次扫描");
+        	put("0502", "系统中没有该数据，请检查参数是否有误");
+        	put("0503", "您已经扫描上传过档案，不能再次进行扫描");
+        	put("0504", "请先扫描档案页再上传");
+        	put("0505", "该档案已审核，不能再扫描");
+        	put("0506", "未配置对应流程，请先配置！");
+        	put("0507", "叫号号码无效！");
+        	put("0508", "请输入叫号号码！");
+        	put("0509", "请选择业务类型！");
+        }
+    };
+}
+

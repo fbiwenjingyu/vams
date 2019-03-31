@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<beans>
+	<!--spring 管理权限service业务逻辑层-->
+	
+	<bean id="stoService" class="com.pd.cwgl.service.StoService">
+		<property name="stoSettingDAO" ref="stoSettingDAO"/>
+		<property name="arcBaseInfoDAO" ref="arcBaseInfoDAO"/>
+		<property name="usersDAO" ref="userDAO"/>
+		<property name="barcodeService" ref="barcodeService"/>
+		<property name="arcStatusRecordDAO" ref="arcStatusRecordDAO"></property>
+		<property name="pubStorageInOutService" ref="pubStorageInOutService"/>
+	</bean>
+	<bean id="pubStoService" class="com.pd.cwgl.service.PubStoService">
+		<property name="stoService" ref="stoService"/>
+	</bean>
+	<bean id="stoQueryService" class="com.pd.cwgl.service.StoQueryService">
+		<property name="arcBaseInfoDAO" ref="arcBaseInfoDAO"/>
+		<property name="stoSettingDAO" ref="stoSettingDAO"/>
+	</bean>
+	
+</beans>

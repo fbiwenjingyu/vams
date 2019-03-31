@@ -1,0 +1,67 @@
+package com.pd.webservice.util;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import com.pd.arc.model.ArcBaseInfo;
+import com.pd.system.startup.SYSLoadManager;
+import com.pd.system.utils.StringTools;
+import com.pd.webservice.pub.vo.Pic;
+import com.pd.webservice.pub.vo.VehBaseInfo;
+import com.pd.wjyw.model.YcInfoPic;
+
+public class BeanUtil {
+
+	public static void copyProperties(ArcBaseInfo arcBaseInfo,
+			VehBaseInfo baseInfo) {
+		
+		//获取号牌种类的中文名称
+		String hpzl = arcBaseInfo.getHpzl();
+		String hpzlName = SYSLoadManager.hpzl_map.get(hpzl);
+		baseInfo.setHpzl(StringTools.nullToBlank(hpzlName));
+		baseInfo.setHphm(StringTools.nullToBlank(arcBaseInfo.getHphm()));
+		baseInfo.setClsbdh(StringTools.nullToBlank(arcBaseInfo.getClsbdh()));
+		String fprq = null;
+		Date fprqDate = arcBaseInfo.getFprq();
+		if (fprqDate == null) {
+			fprq = "";
+		} else {
+			fprq = DatetimeUtil.formatDateTime(fprqDate,"yyyy-MM-dd HH:mm:ss");
+		}
+		baseInfo.setFprq(StringTools.nullToBlank(fprq));
+		baseInfo.setJdcsyr(StringTools.nullToBlank(arcBaseInfo.getSyr()));
+		baseInfo.setSfzmhm(StringTools.nullToBlank(arcBaseInfo.getSfzmhm()));
+		baseInfo.setZsxxdz(StringTools.nullToBlank(arcBaseInfo.getZsxxdz()));
+		baseInfo.setZwpp(StringTools.nullToBlank(arcBaseInfo.getClpp1()));
+		baseInfo.setClxh(StringTools.nullToBlank(arcBaseInfo.getClxh()));
+		baseInfo.setCllx(StringTools.nullToBlank(arcBaseInfo.getCllx()));
+		baseInfo.setCsys(StringTools.nullToBlank(arcBaseInfo.getCsys()));
+		baseInfo.setZzg(StringTools.nullToBlank(arcBaseInfo.getZzg()));
+		baseInfo.setFdjh(StringTools.nullToBlank(arcBaseInfo.getFdjh()));
+		baseInfo.setXzqh(StringTools.nullToBlank(arcBaseInfo.getXzqh()));
+		
+	}
+
+	public static List<Pic> convert(List<YcInfoPic> ycInfoPic) {
+		List<Pic> pics = new ArrayList<Pic>();
+		if(ycInfoPic != null && ycInfoPic.size() > 0){
+			for(YcInfoPic ycPic:ycInfoPic){
+				Pic pic = new Pic();
+				String picName = SYSLoadManager.yc_paper_map.get(ycPic.getTakecode());
+				String base64Code = "";
+				try{
+					base64Code = Base64Image.GetImageStr(ycPic.getPicpath());
+				}catch(Exception e){
+					e.printStackTrace();
+				}	
+				pic .setPicName(picName);
+				pic.setBase64Code(base64Code);
+				pics.add(pic);
+			}
+		}
+		return pics;
+	}
+
+
+}

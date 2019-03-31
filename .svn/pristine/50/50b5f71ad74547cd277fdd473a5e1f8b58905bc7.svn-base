@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<beans>
+	<!-- spring管理struts的的配置文件-->
+	<bean id="attrAction" class="com.pd.base.action.AttrAction" scope="prototype">
+		<property name="service"><ref bean="attrService"/></property>
+	</bean>
+	
+	<bean id="codeSetAction" class="com.pd.base.action.CodeSetAction" scope="prototype">
+		<property name="service"><ref bean="codeSetService"/></property>
+	</bean>
+		
+	<bean id="flowAction" class="com.pd.base.action.FlowAction" scope="prototype">
+		<property name="service"><ref bean="flowService"/></property>
+		<property name="codeSetService"><ref bean="codeSetService"/></property>
+		<property name="roleService"><ref bean="roleService"/></property>
+	</bean>
+		
+	<bean id="paperAction" class="com.pd.base.action.PaperAction" scope="prototype">
+		<property name="service"><ref bean="paperService"/></property>
+		<property name="seclevelService"><ref bean="seclevelService"/></property>
+	</bean>
+		
+	<bean id="seclevelAction" class="com.pd.base.action.SeclevelAction" scope="prototype">
+		<property name="service"><ref bean="seclevelService"/></property>
+	</bean>
+		
+	<bean id="typesetAction" class="com.pd.base.action.TypesetAction" scope="prototype">
+		<property name="service"><ref bean="typeSetService"/></property>
+		<property name="codeSetService"><ref bean="codeSetService"/></property>
+		<property name="paperService"><ref bean="paperService"/></property>
+		<property name="roleService"><ref bean="roleService"/></property>
+	</bean>
+</beans>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN"
+    "http://struts.apache.org/dtds/struts-2.1.7.dtd">
+
+<struts>
+    <package name="swgl" namespace="/swgl" extends="vams-default">
+    	<action name="stoins-*" class="storageInAction" method="{1}">
+    		<result name="form">/swgl/rkgl/ready_ins_form.jsp</result><!-- 进入预入库但 -->
+    		<result name="showArc">/swgl/rkgl/ready_ins_show_arc.jsp</result>
+    		<result name="printRkd">/swgl/rkgl/storage_in_print.jsp</result>
+    		<result name="toCheckin">/swgl/rkgl/check_batch_list.jsp</result>
+    		<result name="checkList">/swgl/rkgl/check_in_list.jsp</result>
+    		<result name="inlist">/swgl/rkgl/query_in_list.jsp</result>
+    		<result name="showInArc">/swgl/rkgl/storage_in_detail_msg.jsp</result>
+    	</action>
+    	<action name="stoouts-*" class="storageOutAction" method="{1}">
+    		<result name="form">/swgl/ckgl/ready_outs_form.jsp</result><!-- 进入预入库但 -->
+    		<result name="showArc">/swgl/ckgl/ready_outs_show_arc.jsp</result>
+    		<result name="printCkd">/swgl/ckgl/storage_out_print.jsp</result>
+    		<result name="toCheckout">/swgl/ckgl/check_batch_list.jsp</result>
+    		<result name="checkList">/swgl/ckgl/check_out_list.jsp</result>
+    		<result name="outlist">/swgl/ckgl/query_out_list.jsp</result>
+    		<result name="showOutArc">/swgl/ckgl/storage_out_detail_msg.jsp</result>
+    	</action>
+    	<action name="stocomb-*" class="storageCombAction" method="{1}">
+    		<result name="list">/swgl/dahb/comb_info_list.jsp</result><!-- 进入档案合并 -->
+    		<result name="showArc">/swgl/dahb/storage_comb_detail_msg.jsp</result>
+    	</action>
+    
+	</package>
+</struts>
+

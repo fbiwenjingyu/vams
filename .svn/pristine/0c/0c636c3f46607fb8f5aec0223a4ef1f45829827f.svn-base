@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<beans>
+	<!-- spring管理struts的的配置文件-->
+	<bean id="ycPaperAction" class="com.pd.wjyw.action.YcPaperAction" scope="prototype">
+		<property name="ycPaperService"><ref bean="ycPaperService"/></property>
+	</bean>
+	
+	<bean id="ycTypePaperAction" class="com.pd.wjyw.action.YcTypePaperAction" scope="prototype">
+		<property name="ycTypePaperService"><ref bean="ycTypePaperService"/></property>
+		<property name="ycPaperService"><ref bean="ycPaperService"/></property>
+		<property name="codeSetService"><ref bean="codeSetService"/></property>
+	</bean>
+	
+	<bean id="ycInfoAction" class="com.pd.wjyw.action.YcInfoAction" scope="prototype">
+		<property name="ycInfoPicService"><ref bean="ycInfoPicService"/></property>
+		<property name="ycInfoService"><ref bean="ycInfoService"/></property>
+		<property name="ycPaperService"><ref bean="ycPaperService"/></property>
+		
+	</bean>
+	
+	<bean id="ycInfoBarcodeAction" class="com.pd.wjyw.action.YcInfoBarcodeAction" scope="prototype">
+		<property name="ycInfoBarcodeService"><ref bean="ycInfoBarcodeService"/></property>
+	</bean>
+</beans>

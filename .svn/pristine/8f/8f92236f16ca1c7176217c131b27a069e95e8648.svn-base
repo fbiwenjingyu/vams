@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<beans>
+	<!-- spring管理struts的的配置文件-->
+	<bean id="roleAction" class="com.pd.right.action.RoleAction" scope="prototype">
+		<property name="service"><ref bean="roleService"/></property>
+		<property name="seclevelService"><ref bean="seclevelService"/></property>
+		<property name="resourcesService"><ref bean="resourcesService"/></property>
+		<property name="roleResService"><ref bean="roleResService"/></property>
+	</bean>
+	<bean id="deptAction" class="com.pd.right.action.DeptAction" scope="prototype">
+		<property name="service"><ref bean="deptService"/></property>
+		<property name="codeSetService"><ref bean="codeSetService"/></property>
+	</bean>
+	<bean id="resourcesAction" class="com.pd.right.action.ResourcesAction" scope="prototype">
+		<property name="service"><ref bean="resourcesService"/></property>
+	</bean>
+	<bean id="roleResAction" class="com.pd.right.action.RoleResAction" scope="prototype">
+		<property name="service"><ref bean="roleResService"/></property>
+		<property name="resourcesService"><ref bean="resourcesService"/></property>
+		
+	</bean>
+	<bean id="usersAction" class="com.pd.right.action.UsersAction" scope="prototype">
+		<property name="service"><ref bean="usersService"/></property>
+		<property name="deptService"><ref bean="deptService"/></property>
+		<property name="roleService"><ref bean="roleService"/></property>
+	</bean>
+	
+	<bean id="loginAction" class="com.pd.right.action.LoginAction" scope="prototype">
+		<property name="usersService"><ref bean="usersService"/></property>
+		<property name="arcBaseYcInfoService"><ref bean="arcBaseYcInfoService"/></property>
+		
+	</bean>
+</beans>

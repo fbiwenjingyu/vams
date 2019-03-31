@@ -1,0 +1,26 @@
+create or replace function get_usable_cwbh(in_pid in varchar2) return number is
+  --声明2个变量，result返回值，v_num计数变量
+  result number;
+  v_num  number;
+
+  --开始
+  begin
+  v_num := 1;--初始值为1
+  --循环
+  for cur in ( select * from arc_base_info where cwsj = in_pid  order by cwbh asc ) loop
+    --如果发现存在cwbh的后三位数值比 序号 值大的时候，则说明储位编号 不连续
+    if to_number(substr(cur.cwbh,6,3)) > v_num then
+      --计算返回的cwbh
+      result := v_num;
+      return(result);
+    end if;
+    --v_num加1，并继续循环
+    v_num := v_num+1;
+  end loop;
+
+  --循环结束后，还未找到不连续的记录，将返回可用最大编号
+  result := v_num;
+  return(result);
+
+  end get_usable_cwbh;
+----------------------------------------------------------------------------------------

@@ -1,0 +1,93 @@
+/* 代码整理：懒人之家 */
+body, h1, h2, h3, h4, h5, h6, p, ul, ol, li, form, img, dl, dt, dd, table, th, td, blockquote, fieldset, div, strong, label, em, img {
+	margin:0;
+	padding:0;
+	border:0;
+}
+ul, ol, li {
+	list-style:none;
+}
+input, button {
+	margin:0;
+	font-size:12px;
+	vertical-align:middle;
+}
+body {
+	font-size:12px;
+	font-family:Arial, Helvetica, sans-serif;
+	color:#333;
+	margin:0 auto;
+}
+table {
+	border-collapse:collapse;
+	border-spacing:0;
+}
+a {
+	color:#333;
+	text-decoration:none;
+}
+#box-lanrenzhijia {
+	width:960px;
+	margin:0 auto;
+}
+.bigPic {
+	MARGIN: 0px auto;
+	OVERFLOW: hidden;
+	WIDTH: 818px;
+	POSITION: relative
+}
+.bigPic A.btnleft {
+	MARGIN-TOP: -42px;
+	DISPLAY: block;
+	BACKGROUND: url(imgs/btnLeft.png);
+	LEFT: 10px;
+	OVERFLOW: hidden;
+	WIDTH: 50px;
+	POSITION: absolute;
+	TOP: 50%;
+	HEIGHT: 85px
+}
+.bigPic A.btnleft:hover {
+	MARGIN-TOP: -42px;
+	DISPLAY: block;
+	BACKGROUND: url(imgs/btnLeft_1.png);
+	LEFT: 10px;
+	OVERFLOW: hidden;
+	WIDTH: 50px;
+	POSITION: absolute;
+	TOP: 50%;
+	HEIGHT: 85px
+}
+.bigPic A.btnright {
+	MARGIN-TOP: -42px;
+	DISPLAY: block;
+	RIGHT: 10px;
+	BACKGROUND: url(imgs/btnRight.png);
+	OVERFLOW: hidden;
+	WIDTH: 50px;
+	POSITION: absolute;
+	TOP: 50%;
+	HEIGHT: 85px
+}
+.bigPic A.btnright:hover {
+	MARGIN-TOP: -42px;
+	DISPLAY: block;
+	RIGHT: 10px;
+	BACKGROUND: url(imgs/btnRight_1.png);
+	OVERFLOW: hidden;
+	WIDTH: 50px;
+	POSITION: absolute;
+	TOP: 50%;
+	HEIGHT: 85px
+}
+.bigPic .info {
+	OVERFLOW: hidden;
+	WIDTH: auto;
+	HEIGHT: auto
+}
+.bigPic .info DIV {
+	OVERFLOW: auto;
+	WIDTH: 818px;
+	HEIGHT: 818px;
+	TEXT-ALIGN: center
+}

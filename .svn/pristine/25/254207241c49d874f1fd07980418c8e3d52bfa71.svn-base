@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN"
+    "http://struts.apache.org/dtds/struts-2.1.7.dtd">
+
+<struts>
+	
+	<!-- 调用资源 -->
+	<package name="res" namespace="/" extends="vams-default">
+		<action name="res-json-*" method="{1}" class="resAction">
+     	</action>
+     	<!-- 缓存刷新 -->
+     	<action name="cache-*" method="{1}" class="cacheManageAction">
+     	</action>
+	</package>
+
+
+   <!-- 系统action -->
+	<package name="sys" namespace="/sys" extends="vams-default">
+		<!-- 打印条码 -->
+		<action name="barcode" class="barcodeAction">
+			<result name="printArcLabel">/system/default/print_arc_label.jsp</result>
+		</action>
+		
+		<action name="barcode-*" method="{1}" class="barcodeAction">
+		</action>
+		
+		<action name="base64ToImage" class="com.pd.system.utils.Base64ToImageAction"></action>
+		<!-- 缓存刷新action -->
+		<action name="flushTemp" method="flush" class="com.pd.base.servlet.TempFlushAction"></action>
+		<!-- 信息推送action -->
+		<action name="pushAction" method="call" class="com.pd.system.res.PushAction"></action>
+	</package>
+	
+	
+</struts>
+

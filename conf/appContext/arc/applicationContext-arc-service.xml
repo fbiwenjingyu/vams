@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<beans>
+	<!--spring 管理权限service业务逻辑层-->
+	<bean id="arcBaseInfoService" class="com.pd.arc.service.ArcBaseInfoService">
+		<property name="arcBaseInfoDAO"><ref bean="arcBaseInfoDAO"/></property>
+		<property name="arcPicInfoDAO"><ref bean="arcPicInfoDAO" /></property>
+		<property name="arcBlackCarDAO"><ref bean="arcBlackCarDAO" /></property>
+		<property name="ycInfoDAO" ref="ycInfoDAO"></property>
+		<property name="ycInfoPicDAO" ref="ycInfoPicDAO"></property>
+		<property name="arcRescanInfoDAO" ref="arcRescanInfoDAO"></property>
+		<property name="arcCallDAO" ref="arcCallDAO"></property>
+		<property name="arcStatusRecordDAO" ref="arcStatusRecordDAO"></property>
+		<property name="pubStoService" ref="pubStoService"></property>
+		<property name="deptDAO" ref="deptDAO"></property>
+		<property name="jdbcTemplate"><ref bean="jdbcTemplate"/></property>
+		<property name="jdbcTemplate1"><ref bean="jdbcTemplate1"/></property>
+	</bean>
+	<bean id="pubArcBaseInfoService" class="com.pd.arc.service.PubArcBaseInfoService">
+		<property name="arcBaseInfoDAO"><ref bean="arcBaseInfoDAO"/></property>
+		<property name="arcPicInfoDAO"><ref bean="arcPicInfoDAO" /></property>
+		<property name="arcCombInfoDAO"><ref bean="arcCombInfoDAO" /></property>
+		<property name="arcStatusRecordDAO"><ref bean="arcStatusRecordDAO" /></property>
+		<property name="jdbcTemplate"><ref bean="jdbcTemplate"/></property>
+		<property name="jdbcTemplate1"><ref bean="jdbcTemplate1"/></property>
+	</bean>
+	<bean id="arcReScanInfoService" class="com.pd.arc.service.ArcReScanInfoService">
+		<property name="arcRescanInfoDAO"><ref bean="arcRescanInfoDAO"/></property>
+	</bean>	
+	
+	<bean id="arcStatusRecordService" class="com.pd.arc.service.ArcStatusRecordService">
+		<property name="arcStatusRecordDAO" ref="arcStatusRecordDAO"/>
+	</bean>
+	
+	<!-- arc查询 -->
+	<bean id="arcQueryService" class="com.pd.arc.service.ArcQueryService">
+		<property name="arcBaseInfoDAO" ref="arcBaseInfoDAO"/>
+	</bean>
+	
+</beans>

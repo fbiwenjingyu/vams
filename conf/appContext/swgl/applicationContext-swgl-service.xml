@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<beans>
+	<!--spring 管理权限service业务逻辑层-->
+	
+	<bean id="storageInService" class="com.pd.swgl.service.StorageInService">
+		<property name="arcStorageInDAO" ref="arcStorageInDAO"/>
+		<property name="pubArcBaseInfoService" ref="pubArcBaseInfoService"/>
+	</bean>
+	<bean id="storageOutService" class="com.pd.swgl.service.StorageOutService">
+		<property name="arcStorageOutDAO" ref="arcStorageOutDAO"/>
+		<property name="arcStorageInDAO" ref="arcStorageInDAO"/>
+		<property name="pubArcBaseInfoService" ref="pubArcBaseInfoService"/>
+	</bean>
+	<bean id="storageCombService" class="com.pd.swgl.service.StorageCombService">
+		<property name="arcStorageCombDAO" ref="arcStorageCombDAO"/>
+		<property name="arcStorageInDAO" ref="arcStorageInDAO"/>
+		<property name="pubArcBaseInfoService" ref="pubArcBaseInfoService"/>
+	</bean>
+	<!-- 公开接口 -->
+	<bean id="pubStorageInOutService" class="com.pd.swgl.service.PubStorageInOutService">
+		<property name="arcStorageInDAO" ref="arcStorageInDAO"/>
+	</bean>
+	
+</beans>

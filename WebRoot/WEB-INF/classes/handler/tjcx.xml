@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN"
+    "http://struts.apache.org/dtds/struts-2.1.7.dtd">
+
+<struts>
+    <package name="tjcx" namespace="/" extends="vams-default">
+		<action name="ycInfoCharts" class="ycInfoChartsAction">
+			<result name="ycInfoByDept_colCharts">/tjcx/ycInfoByDept_colCharts.jsp</result>
+			<result name="ycInfoByDept_pieCharts">/tjcx/ycInfoByDept_pieCharts.jsp</result>
+			
+		</action>
+		
+		<action name="arcBaseInfoCharts" class="arcBaseInfoChartsAction">
+			<result name="ywtjList">/tjcx/ywtjList.jsp</result>
+			<result name="ywtjLast">/tjcx/ywtjLast.jsp</result>
+			<result name="workList_LineCharts">/tjcx/workList_LineCharts.jsp</result>
+			<result name="workList_colCharts">/tjcx/workList_colCharts.jsp</result>	
+			<result name="workList_pieCharts">/tjcx/workList_pieCharts.jsp</result>	
+			<result name="arcInfo_query">/tjcx/arcInfo_query.jsp</result>	
+			<result name="arcInfo_export">/tjcx/arcInfo_export.jsp</result>	
+			<result name="work_colLineCharts">/tjcx/work_colLineCharts.jsp</result>
+					
+		</action>
+	</package>
+</struts>
+

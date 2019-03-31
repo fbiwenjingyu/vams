@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE abatorConfiguration PUBLIC "-//Apache Software Foundation//DTD Abator for iBATIS Configuration 1.0//EN" "http://ibatis.apache.org/dtd/abator-config_1_0.dtd" >
+<!-- 
+  http://ibatis.apache.org/docs/tools/abator/
+ -->
+<abatorConfiguration>
+	<abatorContext>
+		<!--利用ibatis插件生成model dao相关代码-->
+		<jdbcConnection driverClass="oracle.jdbc.driver.OracleDriver" connectionURL="jdbc:oracle:thin:@192.168.1.254:1521:jjx" userId="dtvams" password="dtvams" >
+           <classPathEntry location="C:\\Java\\JAR\\ojdbc14.jar" />
+        </jdbcConnection>
+        
+        <!-- 生成模块组件 -->
+		<javaModelGenerator targetPackage="com.pd.swgl.model" targetProject="dtvams" >
+		   <property name="enableSubPackages" value="true"/>
+		</javaModelGenerator>  
+		<sqlMapGenerator targetPackage="com.pd.swgl.model.sqlmap" targetProject="dtvams" >
+		   <property name="enableSubPackages" value="true"/>
+		</sqlMapGenerator>
+		<daoGenerator targetPackage="com.pd.swgl.dao" targetProject="dtvams" type="spring" >
+           <property name="enableSubPackages" value="true"/>
+		</daoGenerator>
+
+		<!-- 需要生成的表 -->
+		<table tableName="ARC_STORAGE_IN" catalog="jjx" />
+		<table tableName="ARC_STORAGE_OUT" catalog="jjx" />
+		<table tableName="ARC_STORAGE_COMB" catalog="jjx" />
+	</abatorContext>
+</abatorConfiguration>
+
