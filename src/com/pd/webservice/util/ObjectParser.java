@@ -271,6 +271,8 @@ public class ObjectParser {
 		System.out.println(getCommand(str));
 		Map<String, String> map = html2Map(str, "parameter");
 		Map<String, String> map1 = getParam(str);
+		System.out.println(map);
+		System.out.println(map1);
 //		System.out.println(map.get("username"));
 		
 		System.out.println("-------------------------------------------------------------------");
