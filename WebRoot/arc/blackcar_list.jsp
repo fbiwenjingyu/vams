@@ -52,8 +52,9 @@ String preAction = "arcBaseInfo";
 		}
 		
 		top.Dialog.confirm("确认解锁该车辆？",function(){
-			window.location.href="arcBaseInfo!unlock.action?xtdabh=" + xtdabh;
-			alert("提交成功");
+			 $.post("arcBaseInfo!unlock.action",{xtdabh,xtdabh},function(data,status){
+        		alert("解锁成功!");
+    		});
 			top.frmright.window.location.href="arcBaseInfo!queryBlackCar.action";
 			closeWin();
     	},function(){});
